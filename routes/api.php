@@ -1,10 +1,10 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FirebaseAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Kreait\Firebase\Contract\Auth;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -17,15 +17,14 @@ use Kreait\Firebase\Contract\Auth;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-  return $request->user();
+// Health check
+Route::get('/health', function () {
+  return response()->json(['status' => 'ok']);
 });
 
-Route::post('/firebase/register', [FirebaseAuthController::class, 'register']);
 
-
-Route::get('/firebase-test', function (Auth $auth) {
-  return response()->json([
-    'status' => 'Firebase Connected'
-  ]);
+Route::middleware('firebase.auth')->group(function () {
+  // Auth
+  Route::get('/me', [AuthController::class, 'me']);
 });
+

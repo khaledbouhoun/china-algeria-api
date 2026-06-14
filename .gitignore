@@ -1,19 +1,85 @@
-/.phpunit.cache
+# ============================================================================
+# Laravel .gitignore — Best Practices
+# ============================================================================
+
+# ----------------------------- Laravel Core ---------------------------------
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+/vendor
 /node_modules
 /public/build
 /public/hot
 /public/storage
 /storage/*.key
-/vendor
+/storage/framework/cache/data/*
+!/storage/framework/cache/data/.gitkeep
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitkeep
+/storage/framework/views/*
+!/storage/framework/views/.gitkeep
+
+# --------------------------- Environment Files ------------------------------
 .env
-.env.backup
-.env.production
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
+.env.*
+!.env.example
+
+# ------------------------------ Composer ------------------------------------
+composer.phar
 auth.json
+
+# -------------------------------- NPM / Yarn --------------------------------
 npm-debug.log
 yarn-error.log
-/.fleet
+yarn-debug.log
+package-lock.json
+
+# ------------------------------- Testing ------------------------------------
+/.phpunit.cache
+.phpunit.result.cache
+/coverage
+/.pest
+
+# ------------------------------ IDE / Editors --------------------------------
 /.idea
 /.vscode
+/.fleet
+/.project
+/.settings
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+
+# -------------------------------- OS Files ----------------------------------
+Thumbs.db
+Desktop.ini
+.DS_Store
+._*
+
+# ----------------------------- Homestead / Vagrant --------------------------
+Homestead.json
+Homestead.yaml
+.vagrant
+
+# ------------------------------ Docker --------------------------------------
+/docker-compose.override.yml
+
+# ----------------------------- Debugbar / Logs ------------------------------
+/storage/logs/*.log
+!/storage/logs/.gitkeep
+/storage/debugbar
+
+# ----------------------------- Firebase / Credentials -----------------------
+/storage/app/firebase-credentials.json
+*.p12
+*.p8
+/service-account*.json
+/firebase-*.json
+
+# ----------------------------- Miscellaneous --------------------------------
+*.bak
+*.tmp
+*.cache
+/ray.php
