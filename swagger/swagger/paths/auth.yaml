@@ -1,0 +1,122 @@
+/auth/register:
+  post:
+    summary: Register a new local user account
+    description: |
+      Firebase has already created the account client-side.
+      This endpoint verifies the Firebase Bearer token and creates the matching local DB record.
+    security:
+      - BearerAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - full_name
+              - role_id
+            properties:
+              full_name:
+                type: string
+                maxLength: 255
+                example: "John Doe"
+              phone:
+                type: string
+                maxLength: 50
+                nullable: true
+                example: "+213555123456"
+              address:
+                type: string
+                maxLength: 500
+                nullable: true
+                example: "123 Main Street, Algiers"
+              role_id:
+                type: integer
+                minimum: 1
+                maximum: 10
+                description: The ID of the role to assign.
+                example: 2
+              zone_id:
+                type: integer
+                nullable: true
+                description: The ID of the zone to assign.
+                example: 1
+    responses:
+      '201':
+        description: User registered successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                data:
+                  type: object
+                  properties:
+                    user:
+                      $ref: '../schemas/User.yaml'
+      '401':
+        description: Unauthorized - Bearer token missing, invalid, or expired.
+      '422':
+        description: Validation failed.
+      '409':
+        description: Conflict - User with this Firebase UID or email already exists.
+
+/auth/login:
+  post:
+    summary: Authenticate an existing user via Firebase token
+    description: |
+      Finds the local DB record by Firebase UID, updates last_login_at,
+      and returns the user profile.
+    security:
+      - BearerAuth: []
+    responses:
+      '200':
+        description: User authenticated successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                data:
+                  type: object
+                  properties:
+                    user:
+                      $ref: '../schemas/User.yaml'
+      '401':
+        description: Unauthorized - Bearer token missing, invalid, or expired.
+      '404':
+        description: Not Found - Local account does not exist for this Firebase UID.
+
+/auth/me:
+  get:
+    summary: Get current authenticated user profile
+    description: |
+      Returns the currently authenticated user's profile based on the Firebase token.
+    security:
+      - BearerAuth: []
+    responses:
+      '200':
+        description: Profile retrieved successfully.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                data:
+                  type: object
+                  properties:
+                    user:
+                      $ref: '../schemas/User.yaml'
+      '401':
+        description: Unauthorized - Bearer token missing, invalid, or expired.
+      '404':
+        description: Not Found - Local account does not exist for this Firebase UID.

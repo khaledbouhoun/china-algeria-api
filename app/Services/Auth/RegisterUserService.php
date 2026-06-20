@@ -1,0 +1,127 @@
+<?php
+
+namespace App\Services\Auth;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+class RegisterUserService
+{
+    /**
+     * Maps role_id → short alphabetic prefix used in public_code generation.
+     *
+     * Format: USR-{PREFIX}-{sequential_number}
+     * Example: USR-CLI-001, USR-ADM-003, USR-DLV-012
+     */
+    private const ROLE_PREFIX_MAP = [
+        1  => 'ADM',   // Admin
+        2  => 'CLI',   // Client
+        3  => 'CAS',   // Cashier
+        4  => 'AG_A',  // Agent A
+        5  => 'AG_C',  // Agent C
+        6  => 'RS_A',  // Responsable A
+        7  => 'RS_C',  // Responsable C
+        8  => 'GLDR',  // Traveler / Gladiator
+        9  => 'DLV',   // Delivery
+        10 => 'VRF',   // Verifier
+    ];
+
+    /**
+     * Register a new user.
+     *
+     * @param  array{uid: string, email: string, email_verified: bool}  $firebaseUser
+     * @param  array{full_name: string, phone: ?string, address: ?string, role_id: int, zone_id: ?int}  $data
+     *
+     * @throws \Illuminate\Validation\ValidationException  When the firebase_uid or email is already taken.
+     */
+    public function execute(array $firebaseUser, array $data): User
+    {
+        $this->guardAgainstDuplicateFirebaseUid($firebaseUser['uid']);
+        $this->guardAgainstDuplicateEmail($firebaseUser['email']);
+
+        return DB::transaction(function () use ($firebaseUser, $data): User {
+            $publicCode = $this->generatePublicCode((int) $data['role_id']);
+
+            /** @var User $user */
+            $user = User::create([
+                'public_code'       => $publicCode,
+                'firebase_uid'      => $firebaseUser['uid'],
+                'email'             => $firebaseUser['email'],
+                'email_verified_at' => $firebaseUser['email_verified']
+                                        ? now()
+                                        : null,
+                'full_name'         => $data['full_name'],
+                'phone'             => $data['phone'] ?? null,
+                'address'           => $data['address'] ?? null,
+                'role_id'           => $data['role_id'],
+                'zone_id'           => $data['zone_id'] ?? null,
+                'status'            => 'PENDING',
+            ]);
+
+            return $user->load('role', 'zone');
+        });
+    }
+
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Abort with 409 if the firebase_uid is already registered.
+     */
+    private function guardAgainstDuplicateFirebaseUid(string $uid): void
+    {
+        if (User::where('firebase_uid', $uid)->exists()) {
+            abort(response()->json([
+                'status'  => 'error',
+                'message' => 'An account with this Firebase UID already exists.',
+            ], 409));
+        }
+    }
+
+    /**
+     * Abort with 409 if the email is already registered.
+     */
+    private function guardAgainstDuplicateEmail(string $email): void
+    {
+        if (User::where('email', $email)->exists()) {
+            abort(response()->json([
+                'status'  => 'error',
+                'message' => 'An account with this email address already exists.',
+            ], 409));
+        }
+    }
+
+    /**
+     * Generate the next sequential public_code for the given role.
+     *
+     * The sequence is derived from the highest numeric suffix found among
+     * existing users with the same role_id, then incremented by 1.
+     *
+     * Examples:
+     *   No existing user  → USR-CLI-1
+     *   Last code USR-CLI-5 → USR-CLI-6
+     */
+    private function generatePublicCode(int $roleId): string
+    {
+        $prefix = self::ROLE_PREFIX_MAP[$roleId] ?? 'USR';
+
+        $lastUser = User::where('role_id', $roleId)
+            ->whereNotNull('public_code')
+            ->orderByDesc('id')
+            ->first();
+
+        $nextNumber = 1;
+
+        if ($lastUser && $lastUser->public_code) {
+            preg_match('/(\d+)$/', $lastUser->public_code, $matches);
+            $nextNumber = isset($matches[1]) ? ((int) $matches[1] + 1) : 1;
+        }
+
+        // Zero-pad to at least 3 digits: 001, 002, ..., 100, 101
+        $paddedNumber = str_pad((string) $nextNumber, 3, '0', STR_PAD_LEFT);
+
+        return "USR-{$prefix}-{$paddedNumber}";
+    }
+}

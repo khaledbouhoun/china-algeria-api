@@ -1,0 +1,18 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: Unique identifier of the role.
+    example: 2
+  code:
+    type: string
+    description: Unique system code for the role (e.g., CLIENT, ADMIN).
+    example: "CLIENT"
+  name:
+    type: string
+    description: Display name of the role.
+    example: "Client"
+required:
+  - id
+  - code
+  - name

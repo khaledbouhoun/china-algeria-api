@@ -1,0 +1,95 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: Unique identifier of the user.
+    example: 1
+  public_code:
+    type: string
+    description: Public-facing identifier/code for the user.
+    example: "USR-0001"
+  full_name:
+    type: string
+    description: User's full name.
+    example: "John Doe"
+  email:
+    type: string
+    format: email
+    description: User's email address.
+    example: "john@example.com"
+  phone:
+    type: string
+    nullable: true
+    description: User's phone number.
+    example: "+213555123456"
+  address:
+    type: string
+    nullable: true
+    description: User's physical address.
+    example: "123 Main Street, Algiers"
+  status:
+    type: string
+    enum: [PENDING, ENABLED, DISABLED, REJECTED, DELETED]
+    description: Current status of the user account.
+    example: "ENABLED"
+  role_id:
+    type: integer
+    description: The ID of the assigned role.
+    example: 2
+  zone_id:
+    type: integer
+    nullable: true
+    description: The ID of the assigned zone.
+    example: 1
+  email_verified_at:
+    type: string
+    format: date-time
+    nullable: true
+    description: Timestamp when the email was verified.
+    example: "2026-06-20T20:10:57+01:00"
+  last_login_at:
+    type: string
+    format: date-time
+    nullable: true
+    description: Timestamp of the last login.
+    example: "2026-06-20T20:10:57+01:00"
+  created_at:
+    type: string
+    format: date-time
+    description: Timestamp when the user was created.
+    example: "2026-06-20T19:10:59+01:00"
+  updated_at:
+    type: string
+    format: date-time
+    description: Timestamp when the user was last updated.
+    example: "2026-06-20T19:10:59+01:00"
+  role:
+    type: object
+    properties:
+      id:
+        type: integer
+      code:
+        type: string
+      name:
+        type: string
+    description: Associated Role object (only when loaded).
+  zone:
+    type: object
+    nullable: true
+    properties:
+      id:
+        type: integer
+      code:
+        type: string
+      name:
+        type: string
+    description: Associated Zone object (only when loaded).
+required:
+  - id
+  - public_code
+  - full_name
+  - email
+  - status
+  - role_id
+  - created_at
+  - updated_at

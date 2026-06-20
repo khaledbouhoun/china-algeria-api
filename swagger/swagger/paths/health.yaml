@@ -1,0 +1,15 @@
+/health:
+  get:
+    summary: Health check
+    description: Public endpoint to verify that the API server is up and running.
+    responses:
+      '200':
+        description: API is healthy.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: ok

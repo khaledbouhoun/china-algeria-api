@@ -66,6 +66,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
 
         // Firebase Authentication
-        'firebase.auth' => \App\Http\Middleware\FirebaseAuthMiddleware::class,
+        'firebase.auth'          => \App\Http\Middleware\FirebaseAuthMiddleware::class,
+        'firebase.authenticate'  => \App\Http\Middleware\FirebaseAuthenticate::class,
     ];
 }

@@ -1,0 +1,24 @@
+openapi: 3.0.0
+info:
+  title: China-Algeria API
+  version: 1.0.0
+  description: Simplified, role-based backend for the China-Algeria system, authenticated via Firebase ID tokens.
+servers:
+  - url: /api
+    description: Local development / production API prefix
+paths:
+  /health:
+    $ref: './paths/health.yaml#/health'
+  /auth/register:
+    $ref: './paths/auth.yaml#/auth/register'
+  /auth/login:
+    $ref: './paths/auth.yaml#/auth/login'
+  /auth/me:
+    $ref: './paths/auth.yaml#/auth/me'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Firebase ID token (JWT)

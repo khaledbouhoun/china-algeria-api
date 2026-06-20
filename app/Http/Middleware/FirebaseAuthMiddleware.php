@@ -38,7 +38,7 @@ class FirebaseAuthMiddleware
       $uid = $verifiedIdToken->claims()->get('sub');
 
       // Find user
-      $user = User::where('google_uid', $uid)->first();
+      $user = User::where('firebase_uid', $uid)->first();
 
       if (!$user) {
         return response()->json([
