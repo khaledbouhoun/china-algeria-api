@@ -1,0 +1,38 @@
+{
+  "Statutes": [
+    {
+      "type": "item",
+      "status": [
+        "Cl-Created",
+        "Cl-Canceled",
+        "A-Received",
+        "A-Error"
+      ]
+    },
+    {
+      "type": "package_item",
+      "status": [
+        "Packaged",
+        "Shipped",
+        "C-Received",
+        "C-Opened",
+        "C-Verified",
+        "Cl-Received",
+        "Cl-Confirmed",
+        "Cl-Error"
+      ]
+    },
+    {
+      "type": "package",
+      "status": [
+        "A-Created",
+        "A-Canceled",
+        "B-Received",
+        "G-Reserved",
+        "G-Received",
+        "G-Error",
+        "D-Received"
+      ]
+    }
+  ]
+}
