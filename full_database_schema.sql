@@ -182,7 +182,6 @@ CREATE TABLE "wallets" (
 );
 CREATE TABLE "zones" (
 	"id" bigserial PRIMARY KEY,
-	"code" varchar(50) NOT NULL CONSTRAINT "zones_code_key" UNIQUE,
 	"name" varchar(100) NOT NULL,
 	"zone_type" zone_type NOT NULL,
 	"description" text
@@ -261,7 +260,6 @@ CREATE UNIQUE INDEX "wallet_transactions_pkey" ON "wallet_transactions" ("id");
 CREATE INDEX "idx_wallets_role_id" ON "wallets" ("role_id");
 CREATE UNIQUE INDEX "wallets_pkey" ON "wallets" ("id");
 CREATE UNIQUE INDEX "wallets_user_id_key" ON "wallets" ("user_id");
-CREATE UNIQUE INDEX "zones_code_key" ON "zones" ("code");
 CREATE UNIQUE INDEX "zones_pkey" ON "zones" ("id");
 ALTER TABLE "order_item_images" ADD CONSTRAINT "order_item_images_order_item_id_fkey" FOREIGN KEY ("order_item_id") REFERENCES "order_items"("id") ON DELETE CASCADE;
 ALTER TABLE "order_item_steps" ADD CONSTRAINT "order_item_steps_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "users"("id");

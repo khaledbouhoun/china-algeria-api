@@ -9,7 +9,7 @@ class RoleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * 
+     *
      * Seeding the exact 10 roles specified in the requirements.
      */
     public function run(): void
@@ -22,7 +22,7 @@ class RoleSeeder extends Seeder
             ['id' => 5,  'code' => 'AGENT_C',       'name' => 'Agent C'],
             ['id' => 6,  'code' => 'RESP_A',        'name' => 'Responsable A'],
             ['id' => 7,  'code' => 'RESP_C',        'name' => 'Responsable C'],
-            ['id' => 8,  'code' => 'TRAVELER',      'name' => 'Traveler'],
+            ['id' => 8,  'code' => 'GLADIATOR',      'name' => 'Gladiator'],
             ['id' => 9,  'code' => 'DELIVERY',      'name' => 'Delivery'],
             ['id' => 10, 'code' => 'VERIFIER',      'name' => 'Verifier'],
         ];

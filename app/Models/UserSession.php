@@ -11,15 +11,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserSession extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    /**
-     * @property int $id
-     */
+  /**
+   * @property int $id
+   */
 
-    protected $fillable = [
-    ];
+  protected $fillable = [
+    "user_id"
+  ];
 
-    protected $casts = [];
+  protected $casts = [];
+
+  // -------------------------------------------------------------------------
+  // Relationships
+  // -------------------------------------------------------------------------
+
+  public function user(): BelongsTo
+  {
+    return $this->belongsTo(User::class, 'user_id');
+  }
 
 }

@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\PackageStepController;
 use App\Http\Controllers\Api\PackageItemController;
 use App\Http\Controllers\Api\PackageItemStepController;
 use App\Http\Controllers\Api\PackageItemReceptionController;
+use App\Http\Controllers\TestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,21 +33,24 @@ use App\Http\Controllers\Api\PackageItemReceptionController;
 */
 
 // ── Health check ────────────────────────────────────────────────────────────
-Route::get('/health', fn() => response()->json(['status' => 'ok']));
+Route::get('/test', [TestController::class, 'index']);
 
 // ── Auth routes ─────────────────────────────────────────────────────────────
 //
-// All three endpoints are protected by the FirebaseAuthenticate middleware,
-// which verifies the Bearer token and stores firebase_user on $request->attributes.
+// /register  — uses the dedicated Firebase token middleware to verify the
+//              Authorization Bearer token before creating the local account.
+// /login     — uses the same middleware so the token is read from the header.
+// /me        — uses the same middleware for authenticated profile access.
 //
-// /register  — token proves identity; allows unregistered UID (no local user required)
-// /login     — token proves identity; local user must already exist
-// /me        — token proves identity; local user must already exist
-//
-Route::middleware('firebase.auth')->group(function () {
-  Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
-  Route::post('/login',    [AuthController::class, 'login'])->name('auth.login');
-  Route::get('/me',        [AuthController::class, 'me'])->name('auth.me');
+Route::middleware('firebase.token')->group(function () {
+  Route::post('/register', [AuthController::class, 'register']);
+  Route::post('/login', [AuthController::class, 'login']);
+  Route::get('/me', [AuthController::class, 'me']);
+});
+Route::middleware([
+  'firebase.token',
+  'firebase.user',
+])->group(function () {
 
   Route::apiResource('roles', RoleController::class);
   Route::apiResource('zones', ZoneController::class);
