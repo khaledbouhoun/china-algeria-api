@@ -42,16 +42,18 @@ Route::get('/test', [TestController::class, 'index']);
 // /login     — uses the same middleware so the token is read from the header.
 // /me        — uses the same middleware for authenticated profile access.
 //
-Route::middleware('firebase.token')->group(function () {
+Route::middleware('firebase.token:false')->group(function () {
   Route::post('/register', [AuthController::class, 'register']);
-  Route::post('/login', [AuthController::class, 'login']);
-  Route::get('/me', [AuthController::class, 'me']);
 });
-Route::middleware([
-  'firebase.token',
-  'firebase.user',
-])->group(function () {
+Route::middleware('firebase.token')->group(function () {
+  Route::get('/me', [AuthController::class, 'me']);
+  });
+  Route::middleware([
+    'firebase.token',
+    'firebase.user',
+    ])->group(function () {
 
+  Route::post('/login', [AuthController::class, 'login']);
   Route::apiResource('roles', RoleController::class);
   Route::apiResource('zones', ZoneController::class);
   Route::apiResource('countries', CountryController::class);

@@ -54,6 +54,7 @@ class AuthController extends Controller
 
     return response()->json([
       'status' => 'success',
+      'message' => 'User registered successfully.',
       'data' => [
         'user' => new UserResource($user),
       ],
@@ -75,12 +76,14 @@ class AuthController extends Controller
    */
   public function login(LoginRequest $request): JsonResponse
   {
-    $firebaseUser = $request->attributes->get('firebase_user');
+    $firebaseUser = $request->user();
+    // $firebaseUser = $request->attributes->get('firebase_user');
 
-    $user = $this->loginUserService->execute($firebaseUser['uid']);
+    $user = $this->loginUserService->execute($firebaseUser);
 
     return response()->json([
       'status' => 'success',
+      'message' => 'User logged in successfully.',
       'data' => [
         'user' => new UserResource($user),
       ],

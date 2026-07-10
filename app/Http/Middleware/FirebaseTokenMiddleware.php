@@ -17,8 +17,11 @@ class FirebaseTokenMiddleware
    */
 
 
-  public function handle(Request $request, Closure $next): Response
+  #
+  public function handle(Request $request, Closure $next, string $needVerify = 'true'): Response
   {
+    $needVerify = filter_var($needVerify, FILTER_VALIDATE_BOOLEAN);
+
     $token = $request->bearerToken();
 
     if (!$token) {
@@ -26,7 +29,6 @@ class FirebaseTokenMiddleware
     }
 
     try {
-
       $verifiedToken = Firebase::auth()->verifyIdToken($token);
 
       $claims = $verifiedToken->claims();
@@ -39,10 +41,7 @@ class FirebaseTokenMiddleware
         'picture' => $claims->get('picture'),
       ];
 
-      // Optional:
-      // Uncomment if your application requires verified emails.
-
-      if (!$firebaseUser['email_verified']) {
+      if ($needVerify && !$firebaseUser['email_verified']) {
         return response()->json([
           'status' => 'error',
           'message' => 'Email address is not verified.',
@@ -53,9 +52,11 @@ class FirebaseTokenMiddleware
       $request->attributes->set('firebase_user', $firebaseUser);
 
       return $next($request);
+
     } catch (FailedToVerifyToken $e) {
 
       return $this->unauthorized('Invalid or expired authentication token.');
+
     } catch (\Throwable $e) {
 
       Log::error('Firebase authentication failed.', [

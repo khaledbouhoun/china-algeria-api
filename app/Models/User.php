@@ -61,16 +61,19 @@ class User extends Authenticatable
     'role_id',
     'zone_id',
     'status',
-    'verified_at',
+    'proved_at',
     'last_login_at',
   ];
 
   protected $hidden = [
     'firebase_uid',
+    'deleted_at',
+    'role_id',
+    'zone_id',
   ];
 
   protected $casts = [
-    'email_verified_at' => 'datetime',
+    'proved_at' => 'datetime',
     'last_login_at' => 'datetime',
     // status is stored as a string enum — do NOT cast to integer.
     'status' => 'string',
@@ -109,5 +112,5 @@ class User extends Authenticatable
     return $this->status === self::STATUS_PENDING;
   }
 
-  
+
 }

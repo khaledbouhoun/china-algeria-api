@@ -69,15 +69,15 @@ class RegisterUserService
 
       $user = User::create([
         'public_code' => $publicCode,
-        'firebase_uid' => $firebaseUser['uid'],
-        'email' => $firebaseUser['email'],
-        'email_verified_at' => null,
         'full_name' => $data['full_name'],
+        'email' => $firebaseUser['email'],
         'phone' => $data['phone'] ?? null,
         'address' => $data['address'] ?? null,
+        'firebase_uid' => $firebaseUser['uid'],
         'role_id' => $data['role_id'],
         'zone_id' => $zoneId,
         'status' => 'PENDING',
+        'proved_at' => null,
       ]);
 
 

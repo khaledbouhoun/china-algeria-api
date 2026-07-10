@@ -11,15 +11,22 @@ class FirebaseUserMiddleware
 {
   public function handle(Request $request, Closure $next): Response
   {
-    $firebase = $request->attributes->get('firebase');
+    $firebaseUid = $request->attributes->get('firebase_uid');
 
-    $user = User::where('firebase_uid', $firebase['uid'])->first();
+    $user = User::where('firebase_uid', $firebaseUid)->first();
 
     if (!$user) {
       return response()->json([
         'status' => 'error',
         'message' => 'User is not registered.',
       ], Response::HTTP_NOT_FOUND);
+    }
+
+    if ($user->proved_at == null) {
+      return response()->json([
+        'status' => 'error',
+        'message' => 'User is not proved.',
+      ], Response::HTTP_FORBIDDEN);
     }
 
     $request->setUserResolver(fn() => $user);
