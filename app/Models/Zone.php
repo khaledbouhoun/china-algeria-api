@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,20 +12,37 @@ class Zone extends Model
 {
   use HasFactory;
 
+  protected $table = 'zones';
+
   protected $fillable = [
-    'code',
     'name',
     'zone_type',
     'description',
   ];
 
+  protected $casts = [
+    'id' => 'integer',
+  ];
+
   public $timestamps = false;
 
-  /**
-   * Get the users in this zone.
-   */
   public function users(): HasMany
   {
-    return $this->hasMany(User::class);
+    return $this->hasMany(User::class, 'zone_id');
+  }
+
+  public function orderItemSteps(): HasMany
+  {
+    return $this->hasMany(OrderItemStep::class, 'zone_id');
+  }
+
+  public function packageItemSteps(): HasMany
+  {
+    return $this->hasMany(PackageItemStep::class, 'zone_id');
+  }
+
+  public function packageSteps(): HasMany
+  {
+    return $this->hasMany(PackageStep::class, 'zone_id');
   }
 }

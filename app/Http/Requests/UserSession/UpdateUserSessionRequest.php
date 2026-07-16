@@ -9,18 +9,18 @@ use Illuminate\Validation\Rule;
 
 class UpdateUserSessionRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
+  public function authorize(): bool
+  {
+    return true;
+  }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function rules(): array
-    {
-        return [
-            'id' => ['sometimes', 'integer'],
-        ];
-    }
+  /**
+   * @return array<string, mixed>
+   */
+  public function rules(): array
+  {
+    return [
+      'user_id' => ['sometimes', 'integer', 'exists:users,id'],
+    ];
+  }
 }

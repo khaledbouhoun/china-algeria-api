@@ -11,20 +11,37 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Wallet extends Model
 {
-    use HasFactory;
+  use HasFactory;
 
-    /**
-     * @property int $id
-     */
+  protected $table = 'wallets';
 
-    protected $fillable = [
-    ];
+  protected $fillable = [
+    'user_id',
+    'role_id',
+    'balance',
+  ];
 
-    protected $casts = [];
+  protected $casts = [
+    'id' => 'integer',
+    'user_id' => 'integer',
+    'role_id' => 'integer',
+    'balance' => 'decimal:2',
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
+  ];
 
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, "user_id");
-    }
+  public function user(): BelongsTo
+  {
+    return $this->belongsTo(User::class, 'user_id');
+  }
 
+  public function role(): BelongsTo
+  {
+    return $this->belongsTo(Role::class, 'role_id');
+  }
+
+  public function transactions(): HasMany
+  {
+    return $this->hasMany(WalletTransaction::class, 'wallet_id');
+  }
 }

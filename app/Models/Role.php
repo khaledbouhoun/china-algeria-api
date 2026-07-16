@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,17 +12,26 @@ class Role extends Model
 {
   use HasFactory;
 
+  protected $table = 'roles';
+
   protected $fillable = [
-    "name",
-    "zone_type",
-    "description",
+    'code',
+    'name',
   ];
 
-  /**
-   * Get the users that have this role.
-   */
+  protected $casts = [
+    'id' => 'integer',
+    'created_at' => 'datetime',
+    'updated_at' => 'datetime',
+  ];
+
   public function users(): HasMany
   {
-    return $this->hasMany(User::class);
+    return $this->hasMany(User::class, 'role_id');
+  }
+
+  public function wallets(): HasMany
+  {
+    return $this->hasMany(Wallet::class, 'role_id');
   }
 }

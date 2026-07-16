@@ -5,37 +5,52 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\OrderItem;
+use App\Models\User;
+use App\Queries\OrderItemVisibility;
 
 class OrderItemService
 {
-    public function list(array $filters = []): mixed
-    {
-        return OrderItem::query()->get();
+  public function list(User $user, array $filters = []): mixed
+  {
+    $query = OrderItem::query();
+    OrderItemVisibility::apply($query, $user);
+
+    if (isset($filters['order_id'])) {
+      $query->where('order_id', $filters['order_id']);
     }
 
-    public function find(int $id): ?OrderItem
-    {
-        return OrderItem::find($id);
-    }
+    return $query->with(['order', 'currentStep', 'steps', 'images'])->get();
+  }
 
-    public function create(array $data): OrderItem
-    {
-        return OrderItem::create($data);
-    }
+  public function find(User $user, int $id): ?OrderItem
+  {
+    $query = OrderItem::query()->whereKey($id);
+    OrderItemVisibility::apply($query, $user);
 
-    public function update(int $id, array $data): OrderItem
-    {
-        $model = OrderItem::findOrFail($id);
-        $model->fill($data);
-        $model->save();
+    return $query->with(['order', 'currentStep', 'steps', 'images'])->first();
+  }
 
-        return $model->fresh();
-    }
+  public function create(User $user, array $data): OrderItem
+  {
+    $model = OrderItem::create($data);
+    $model->load(['order', 'currentStep', 'steps', 'images']);
 
-    public function delete(int $id): bool
-    {
-        $model = OrderItem::findOrFail($id);
+    return $model;
+  }
 
-        return (bool) $model->delete();
-    }
+  public function update(User $user, int $id, array $data): OrderItem
+  {
+    $model = OrderItem::findOrFail($id);
+    $model->fill($data);
+    $model->save();
+
+    return $model->fresh()->load(['order', 'currentStep', 'steps', 'images']);
+  }
+
+  public function delete(User $user, int $id): bool
+  {
+    $model = OrderItem::findOrFail($id);
+
+    return (bool) $model->delete();
+  }
 }

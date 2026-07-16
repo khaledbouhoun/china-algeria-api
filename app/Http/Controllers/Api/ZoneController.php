@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Zone\StoreZoneRequest;
 use App\Http\Requests\Zone\UpdateZoneRequest;
-use App\Http\Resources\ZoneResource;
+use App\Http\Resources\Zone\ZoneResource;
 use App\Services\ZoneService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

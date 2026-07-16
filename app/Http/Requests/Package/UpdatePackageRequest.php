@@ -4,23 +4,33 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Package;
 
+use App\Models\PackageStep;
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdatePackageRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
+  public function authorize(): bool
+  {
+    return true;
+  }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function rules(): array
-    {
-        return [
-            'id' => ['sometimes', 'integer'],
-        ];
-    }
+  /**
+   * @return array<string, mixed>
+   */
+  public function rules(): array
+  {
+    return [
+      'qr_code' => ['sometimes', 'string', 'max:255', Rule::unique('packages', 'qr_code')->ignore($this->route('package'))],
+      'items_count' => ['nullable', 'integer'],
+      'weight' => ['nullable', 'numeric'],
+      'amount' => ['nullable', 'numeric'],
+      'comment' => ['nullable', 'string'],
+      'created_by' => ['nullable', 'integer', Rule::exists(User::class, 'id')],
+      'updated_by' => ['nullable', 'integer', Rule::exists(User::class, 'id')],
+      'gladiator_id' => ['nullable', 'integer', Rule::exists(User::class, 'id')],
+      'current_step_id' => ['sometimes', 'integer', Rule::exists(PackageStep::class, 'id')],
+    ];
+  }
 }

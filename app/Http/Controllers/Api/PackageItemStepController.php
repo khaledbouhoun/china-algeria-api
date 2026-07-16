@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PackageItemStep\StorePackageItemStepRequest;
 use App\Http\Requests\PackageItemStep\UpdatePackageItemStepRequest;
-use App\Http\Resources\PackageItemStepResource;
+use App\Http\Resources\PackageItemStep\PackageItemStepResource;
 use App\Services\PackageItemStepService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

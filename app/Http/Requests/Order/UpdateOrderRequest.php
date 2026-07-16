@@ -4,23 +4,25 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Order;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class UpdateOrderRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
+  public function authorize(): bool
+  {
+    return true;
+  }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function rules(): array
-    {
-        return [
-            'id' => ['sometimes', 'integer'],
-        ];
-    }
+  /**
+   * @return array<string, mixed>
+   */
+  public function rules(): array
+  {
+    return [
+      'client_id' => ['sometimes', 'integer', Rule::exists(User::class, 'id')],
+      'comment' => ['nullable', 'string'],
+    ];
+  }
 }

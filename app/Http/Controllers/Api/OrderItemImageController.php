@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderItemImage\StoreOrderItemImageRequest;
 use App\Http\Requests\OrderItemImage\UpdateOrderItemImageRequest;
-use App\Http\Resources\OrderItemImageResource;
+use App\Http\Resources\OrderItemImage\OrderItemImageResource;
 use App\Services\OrderItemImageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

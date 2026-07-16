@@ -141,7 +141,7 @@ CREATE TABLE "users" (
 	"role_id" bigint NOT NULL,
 	"zone_id" bigint,
 	"status" varchar(20) DEFAULT 'ENABLED' NOT NULL,
-	"verified_at" timestamp with time zone,
+	"proved_at" timestamp with time zone,
 	"last_login_at" timestamp with time zone,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,

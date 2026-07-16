@@ -9,18 +9,21 @@ use Illuminate\Validation\Rule;
 
 class UpdateRoleRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
+  public function authorize(): bool
+  {
+    return true;
+  }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function rules(): array
-    {
-        return [
-            'id' => ['sometimes', 'integer'],
-        ];
-    }
+  /**
+   * @return array<string, mixed>
+   */
+  public function rules(): array
+  {
+    $id = $this->route('id');
+
+    return [
+      'code' => ['sometimes', 'string', 'max:50', Rule::unique('roles', 'code')->ignore($id)],
+      'name' => ['sometimes', 'string', 'max:100', Rule::unique('roles', 'name')->ignore($id)],
+    ];
+  }
 }

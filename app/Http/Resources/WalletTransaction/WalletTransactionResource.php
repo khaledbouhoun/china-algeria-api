@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\WalletTransaction;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class OrderItemResource extends JsonResource
+class WalletTransactionResource extends JsonResource
 {
     public function toArray($request): array
     {

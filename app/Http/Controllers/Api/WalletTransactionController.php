@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WalletTransaction\StoreWalletTransactionRequest;
 use App\Http\Requests\WalletTransaction\UpdateWalletTransactionRequest;
-use App\Http\Resources\WalletTransactionResource;
+use App\Http\Resources\WalletTransaction\WalletTransactionResource;
 use App\Services\WalletTransactionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

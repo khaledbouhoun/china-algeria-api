@@ -1,0 +1,20 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Queries;
+
+use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+
+class VisaVisibility
+{
+  public static function apply(Builder $query, User $user): Builder
+  {
+    if ($user->hasRole(User::ROLE_ADMIN, User::ROLE_CASHIER, User::ROLE_AGENT_A, User::ROLE_AGENT_C, User::ROLE_RESPONSABLE_A, User::ROLE_RESPONSABLE_C, User::ROLE_DELIVERY, User::ROLE_VERIFIER)) {
+      return $query;
+    }
+
+    return $query->where('user_id', $user->id);
+  }
+}

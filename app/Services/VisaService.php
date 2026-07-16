@@ -4,38 +4,53 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\Visa;
+use App\Queries\VisaVisibility;
 
 class VisaService
 {
-    public function list(array $filters = []): mixed
-    {
-        return Visa::query()->get();
+  public function list(User $user, array $filters = []): mixed
+  {
+    $query = Visa::query();
+    VisaVisibility::apply($query, $user);
+
+    if (isset($filters['user_id'])) {
+      $query->where('user_id', $filters['user_id']);
     }
 
-    public function find(int $id): ?Visa
-    {
-        return Visa::find($id);
-    }
+    return $query->with(['user', 'creator'])->get();
+  }
 
-    public function create(array $data): Visa
-    {
-        return Visa::create($data);
-    }
+  public function find(User $user, int $id): ?Visa
+  {
+    $query = Visa::query()->whereKey($id);
+    VisaVisibility::apply($query, $user);
 
-    public function update(int $id, array $data): Visa
-    {
-        $model = Visa::findOrFail($id);
-        $model->fill($data);
-        $model->save();
+    return $query->with(['user', 'creator'])->first();
+  }
 
-        return $model->fresh();
-    }
+  public function create(User $user, array $data): Visa
+  {
+    $model = Visa::create($data);
+    $model->load(['user', 'creator']);
 
-    public function delete(int $id): bool
-    {
-        $model = Visa::findOrFail($id);
+    return $model;
+  }
 
-        return (bool) $model->delete();
-    }
+  public function update(User $user, int $id, array $data): Visa
+  {
+    $model = Visa::findOrFail($id);
+    $model->fill($data);
+    $model->save();
+
+    return $model->fresh()->load(['user', 'creator']);
+  }
+
+  public function delete(User $user, int $id): bool
+  {
+    $model = Visa::findOrFail($id);
+
+    return (bool) $model->delete();
+  }
 }

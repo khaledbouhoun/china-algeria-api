@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserSession\StoreUserSessionRequest;
 use App\Http\Requests\UserSession\UpdateUserSessionRequest;
-use App\Http\Resources\UserSessionResource;
+use App\Http\Resources\UserSession\UserSessionResource;
 use App\Services\UserSessionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

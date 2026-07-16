@@ -9,18 +9,19 @@ use Illuminate\Validation\Rule;
 
 class StoreRoleRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
+  public function authorize(): bool
+  {
+    return true;
+  }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function rules(): array
-    {
-        return [
-            'id' => ['sometimes', 'integer'],
-        ];
-    }
+  /**
+   * @return array<string, mixed>
+   */
+  public function rules(): array
+  {
+    return [
+      'code' => ['required', 'string', 'max:50', 'unique:roles,code'],
+      'name' => ['required', 'string', 'max:100', 'unique:roles,name'],
+    ];
+  }
 }

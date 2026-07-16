@@ -4,38 +4,49 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\Wallet;
+use App\Queries\WalletVisibility;
 
 class WalletService
 {
-    public function list(array $filters = []): mixed
-    {
-        return Wallet::query()->get();
-    }
+  public function list(User $user, array $filters = []): mixed
+  {
+    $query = Wallet::query();
+    WalletVisibility::apply($query, $user);
 
-    public function find(int $id): ?Wallet
-    {
-        return Wallet::find($id);
-    }
+    return $query->with(['user', 'role', 'transactions'])->get();
+  }
 
-    public function create(array $data): Wallet
-    {
-        return Wallet::create($data);
-    }
+  public function find(User $user, int $id): ?Wallet
+  {
+    $query = Wallet::query()->whereKey($id);
+    WalletVisibility::apply($query, $user);
 
-    public function update(int $id, array $data): Wallet
-    {
-        $model = Wallet::findOrFail($id);
-        $model->fill($data);
-        $model->save();
+    return $query->with(['user', 'role', 'transactions'])->first();
+  }
 
-        return $model->fresh();
-    }
+  public function create(User $user, array $data): Wallet
+  {
+    $model = Wallet::create($data);
+    $model->load(['user', 'role', 'transactions']);
 
-    public function delete(int $id): bool
-    {
-        $model = Wallet::findOrFail($id);
+    return $model;
+  }
 
-        return (bool) $model->delete();
-    }
+  public function update(User $user, int $id, array $data): Wallet
+  {
+    $model = Wallet::findOrFail($id);
+    $model->fill($data);
+    $model->save();
+
+    return $model->fresh()->load(['user', 'role', 'transactions']);
+  }
+
+  public function delete(User $user, int $id): bool
+  {
+    $model = Wallet::findOrFail($id);
+
+    return (bool) $model->delete();
+  }
 }

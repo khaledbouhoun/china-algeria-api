@@ -112,5 +112,10 @@ class User extends Authenticatable
     return $this->status === self::STATUS_PENDING;
   }
 
+  public function hasRole(int ...$roles): bool
+  {
+    return in_array($this->role_id, $roles, true);
+  }
+
 
 }

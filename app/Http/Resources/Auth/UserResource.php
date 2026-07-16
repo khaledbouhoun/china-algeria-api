@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources\Auth;
 
-use App\Http\Resources\RoleResource;
-use App\Http\Resources\ZoneResource;
+use App\Http\Resources\Role\RoleResource;
+use App\Http\Resources\Zone\ZoneResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Country\StoreCountryRequest;
 use App\Http\Requests\Country\UpdateCountryRequest;
-use App\Http\Resources\CountryResource;
+use App\Http\Resources\Country\CountryResource;
 use App\Services\CountryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

@@ -25,7 +25,7 @@ class FirebaseUserMiddleware
     if ($user->proved_at == null) {
       return response()->json([
         'status' => 'error',
-        'message' => 'User is not proved.',
+        'message' => 'User is not proved.',20
       ], Response::HTTP_FORBIDDEN);
     }
 

@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Status\StoreStatusRequest;
 use App\Http\Requests\Status\UpdateStatusRequest;
-use App\Http\Resources\StatusResource;
+use App\Http\Resources\Status\StatusResource;
 use App\Services\StatusService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderItemStep\StoreOrderItemStepRequest;
 use App\Http\Requests\OrderItemStep\UpdateOrderItemStepRequest;
-use App\Http\Resources\OrderItemStepResource;
+use App\Http\Resources\OrderItemStep\OrderItemStepResource;
 use App\Services\OrderItemStepService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
