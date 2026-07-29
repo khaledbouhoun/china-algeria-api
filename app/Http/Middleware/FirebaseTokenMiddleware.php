@@ -63,7 +63,7 @@ class FirebaseTokenMiddleware
         'exception' => $e,
       ]);
 
-      return $this->unauthorized('Authentication failed.');
+      return $this->unauthorized('Authentication failed (unauthorized).');
     }
   }
 
