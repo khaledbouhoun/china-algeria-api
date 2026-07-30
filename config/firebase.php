@@ -56,7 +56,10 @@ return [
         ? [
           'file' => env('FIREBASE_CREDENTIALS'),
         ]
-        : json_decode(env('FIREBASE_CREDENTIALS_JSON', '{}'), true),
+        : json_decode(
+          base64_decode(env('FIREBASE_CREDENTIALS_B64', '')),
+          true
+        ),
       /*
        * ------------------------------------------------------------------------
        * Firebase Auth Component
