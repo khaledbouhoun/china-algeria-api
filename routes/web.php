@@ -21,3 +21,14 @@ Route::get('/', function () {
 Route::get('/test-login', function () {
   return view('test-login');
 });
+
+
+
+Route::get('/firebase-debug', function () {
+  return response()->json([
+    'project_id' => env('FIREBASE_PROJECT_ID'),
+    'has_json' => !empty(env('FIREBASE_CREDENTIALS_JSON')),
+    'json_length' => strlen(env('FIREBASE_CREDENTIALS_JSON', '')),
+    'json_preview' => substr(env('FIREBASE_CREDENTIALS_JSON', ''), 0, 30),
+  ]);
+});
