@@ -30,5 +30,6 @@ Route::get('/firebase-debug', function () {
     'has_json' => !empty(env('FIREBASE_CREDENTIALS_JSON')),
     'json_length' => strlen(env('FIREBASE_CREDENTIALS_JSON', '')),
     'json_preview' => substr(env('FIREBASE_CREDENTIALS_JSON', ''), 0, 30),
+    'json' => json_decode(env('FIREBASE_CREDENTIALS_JSON'), true),
   ]);
 });
