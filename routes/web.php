@@ -26,63 +26,28 @@ Route::get('/test-login', function () {
 
 
 Route::get('/firebase-debug', function () {
-
   $json = env('FIREBASE_CREDENTIALS_JSON');
 
-  $decoded = json_decode($json, true);
+  return [
+    'length' => strlen($json),
+    'json_error' => json_last_error_msg(),
+    'decode' => json_decode($json, true),
 
-  $jsonError = json_last_error_msg();
+    'contains_backslash_n' => str_contains($json, '\\n'),
+    'contains_real_newline' => str_contains($json, "-----BEGIN PRIVATE KEY-----\nMII"),
 
-  $tmpPath = storage_path('app/firebase/firebase_credentials.json');
+    'first_250' => substr($json, 0, 250),
 
-  if (!empty($json)) {
-    File::ensureDirectoryExists(dirname($tmpPath));
-    File::put($tmpPath, $json);
-  }
+    'private_key_sample' => preg_match(
+      '/"private_key"\s*:\s*"(.{0,150})/s',
+      $json,
+      $m
+    ) ? $m[1] : null,
 
-  $fileExists = File::exists($tmpPath);
-
-  $fileContent = $fileExists ? File::get($tmpPath) : null;
-
-  $decodedFile = $fileExists ? json_decode($fileContent, true) : null;
-
-  return response()->json([
-
-    // Environment
-    'php_version' => PHP_VERSION,
-    'laravel' => app()->version(),
-
-    // Env variables
-    'env' => [
-      'FIREBASE_PROJECT_ID' => env('FIREBASE_PROJECT_ID'),
-      'FIREBASE_CREDENTIALS' => env('FIREBASE_CREDENTIALS'),
-      'FIREBASE_CREDENTIALS_JSON_exists' => !empty($json),
-      'FIREBASE_CREDENTIALS_JSON_length' => strlen($json ?? ''),
-    ],
-
-    // Raw JSON
-    'json' => [
-      'valid' => $decoded !== null,
-      'error' => $jsonError,
-      'type' => $decoded['type'] ?? null,
-      'project_id' => $decoded['project_id'] ?? null,
-      'client_email' => $decoded['client_email'] ?? null,
-      'private_key_exists' => isset($decoded['private_key']),
-      'private_key_length' => isset($decoded['private_key']) ? strlen($decoded['private_key']) : 0,
-      'preview' => substr($json ?? '', 0, 300),
-    ],
-
-    // Temporary file
-    'file' => [
-      'path' => $tmpPath,
-      'exists' => $fileExists,
-      'size' => $fileExists ? filesize($tmpPath) : null,
-      'json_valid' => $decodedFile !== null,
-      'project_id' => $decodedFile['project_id'] ?? null,
-    ],
-
-    // Config loaded by Laravel
-    'config' => config('firebase.projects.app'),
-
-  ]);
+    'hex_after_begin' => bin2hex(substr(
+      $json,
+      strpos($json, '-----BEGIN PRIVATE KEY-----'),
+      40
+    )),
+  ];
 });
