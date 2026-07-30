@@ -52,9 +52,11 @@ return [
       'project_id' => env('FIREBASE_PROJECT_ID'),
 
 
-      'credentials' => [
-        'file' => env('FIREBASE_CREDENTIALS'),
-      ],
+      'credentials' => env('FIREBASE_CREDENTIALS')
+        ? [
+          'file' => env('FIREBASE_CREDENTIALS'),
+        ]
+        : json_decode(env('FIREBASE_CREDENTIALS_JSON', '{}'), true),
       /*
        * ------------------------------------------------------------------------
        * Firebase Auth Component
