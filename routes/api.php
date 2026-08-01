@@ -42,6 +42,59 @@ Route::get('/test', [TestController::class, 'index']);
 // /login     — uses the same middleware so the token is read from the header.
 // /me        — uses the same middleware for authenticated profile access.
 //
+
+Route::post('/firebase-token', function (Request $request) {
+
+    // Optional: protect the endpoint with a secret header
+
+    if ($request->header('X-Dev-Key') !== env('DEV_API_KEY')) {
+
+        return response()->json([
+
+            'message' => 'Unauthorized'
+
+        ], 401);
+
+    }
+
+    $request->validate([
+
+        'email' => 'required|email',
+
+        'password' => 'required|string',
+
+    ]);
+
+    $response = Http::post(
+
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' . env('FIREBASE_WEB_API_KEY'),
+
+        [
+
+            'email' => $request->email,
+
+            'password' => $request->password,
+
+            'returnSecureToken' => true,
+
+        ]
+
+    );
+
+    if (! $response->successful()) {
+
+        return response()->json($response->json(), 401);
+
+    }
+
+    return response()->json([
+
+        'token' => $response->json()['idToken'],
+
+    ]);
+
+})
+
 Route::middleware('firebase.token:false')->group(function () {
   Route::post('/register', [AuthController::class, 'register']);
 });
