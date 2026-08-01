@@ -41,7 +41,7 @@ Route::get('/test', [TestController::class, 'index']);
 //              Authorization Bearer token before creating the local account.
 // /login     — uses the same middleware so the token is read from the header.
 // /me        — uses the same middleware for authenticated profile access.
-//
+
 Route::middleware('firebase.token:false')->group(function () {
   Route::post('/register', [AuthController::class, 'register']);
 });
