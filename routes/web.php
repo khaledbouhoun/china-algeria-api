@@ -19,4 +19,10 @@ Route::get('/', function () {
 });
 
 
+Route::get('/test-login', function () {
+  return view('test-login');
+});
+
+
+
 
