@@ -21,7 +21,6 @@ class UpdateOrderRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'client_id' => ['sometimes', 'integer', Rule::exists(User::class, 'id')],
       'comment' => ['nullable', 'string'],
     ];
   }

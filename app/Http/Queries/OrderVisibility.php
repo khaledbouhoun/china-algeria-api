@@ -13,7 +13,7 @@ class OrderVisibility
   public static function apply(Builder $query, User $user): Builder
   {
     if ($user->hasRole(User::ROLE_CLIENT)) {
-      return $query->where('user_id', $user->id)->where('deleted_at', null);
+      return $query->where('client_id', $user->id)->where('deleted_at', null);
     }
     return $query->whereRaw('1 = 0');
   }

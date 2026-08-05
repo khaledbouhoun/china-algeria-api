@@ -20,61 +20,36 @@ class OrderController extends Controller
 
   public function index(Request $request): JsonResponse
   {
-    $user = $request->userOrFail();
-    $items = $this->service->list($user, $request->all());
+    $orders = $this->service->list($request->user(), $request->all());
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Items retrieved successfully.',
-      'data' => OrderResource::collection($items),
-    ]);
+    return $this->success(OrderResource::collection($orders), 'Orders retrieved successfully.');
   }
 
   public function show(Request $request, int $id): JsonResponse
   {
-    $user = $request->userOrFail();
-    $item = $this->service->find($user, $id);
+    $order = $this->service->find($request->user(), $id);
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Item retrieved successfully.',
-      'data' => $item ? new OrderResource($item) : null,
-    ]);
+    return $this->success(new OrderResource($order), 'Order retrieved successfully.');
   }
 
   public function store(StoreOrderRequest $request): JsonResponse
   {
-    $user = $request->userOrFail();
-    $item = $this->service->create($user, $request->validated());
+    $order = $this->service->create($request->user(), $request->validated());
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Item created successfully.',
-      'data' => new OrderResource($item),
-    ], 201);
+    return $this->success(new OrderResource($order), 'Order created successfully.', 201);
   }
 
   public function update(Request $request, int $id, UpdateOrderRequest $formRequest): JsonResponse
   {
-    $user = $request->userOrFail();
-    $item = $this->service->update($user, $id, $formRequest->validated());
+    $order = $this->service->update($request->user(), $id, $formRequest->validated());
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Item updated successfully.',
-      'data' => new OrderResource($item),
-    ]);
+    return $this->success(new OrderResource($order), 'Order updated successfully.');
   }
 
   public function destroy(Request $request, int $id): JsonResponse
   {
-    $user = $request->userOrFail();
-    $this->service->delete($user, $id);
+    $this->service->delete($request->user(), $id);
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Item deleted successfully.',
-      'data' => null,
-    ]);
+    return $this->success(null, 'Order deleted successfully.');
   }
 }

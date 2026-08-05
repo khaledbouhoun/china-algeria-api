@@ -7,49 +7,72 @@ namespace App\Services;
 use App\Models\Order;
 use App\Models\User;
 use App\Queries\OrderVisibility;
+use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
+
+  public function __construct(
+    private readonly OrderItemService $orderItemService,
+  ) {
+  }
   public function list(User $user, array $filters = []): mixed
   {
-    $query = Order::query();
+    $query = Order::query()->withCount('items');
     OrderVisibility::apply($query, $user);
 
-    if (isset($filters['client_id'])) {
-      $query->where('client_id', $filters['client_id']);
-    }
-
-    return $query->with(['client', 'items'])->get();
+    return $query->get();
   }
-
-  public function find(User $user, int $id): ?Order
+  public function find(User $user, int $id): Order
   {
     $query = Order::query()->whereKey($id);
     OrderVisibility::apply($query, $user);
 
-    return $query->with(['client', 'items'])->first();
+    return $query->firstOrFail();
   }
+
+
 
   public function create(User $user, array $data): Order
   {
-    $model = Order::create($data);
-    $model->load(['client', 'items']);
+    return DB::transaction(function () use ($user, $data) {
+      // $client_id = $user->client_id;
+      $items = $data['items'] ?? [];
 
-    return $model;
+      unset($data['items']);
+      // add c
+      $order = Order::create($data);
+
+      foreach ($items as $item) {
+
+        $item['order_id'] = $order->id;
+
+        $this->orderItemService->create($user, $item);
+      }
+
+      return $order->fresh()->
+        load('items');
+    });
   }
 
   public function update(User $user, int $id, array $data): Order
   {
-    $model = Order::findOrFail($id);
+    $query = Order::query()->whereKey($id);
+    OrderVisibility::apply($query, $user);
+
+    $model = $query->firstOrFail();
     $model->fill($data);
     $model->save();
 
-    return $model->fresh()->load(['client', 'items']);
+    return $model->fresh();
   }
 
   public function delete(User $user, int $id): bool
   {
-    $model = Order::findOrFail($id);
+    $query = Order::query()->whereKey($id);
+    OrderVisibility::apply($query, $user);
+
+    $model = $query->firstOrFail();
 
     return (bool) $model->delete();
   }
