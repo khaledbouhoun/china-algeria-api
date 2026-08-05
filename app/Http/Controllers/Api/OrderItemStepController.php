@@ -14,62 +14,44 @@ use Illuminate\Http\Request;
 
 class OrderItemStepController extends Controller
 {
-    public function __construct(private readonly OrderItemStepService $service)
-    {
-    }
+  public function __construct(private readonly OrderItemStepService $service)
+  {
+  }
 
-    public function index(Request $request): JsonResponse
-    {
-        $items = $this->service->list($request->all());
+  public function index(Request $request): JsonResponse
+  {
+    $user = $request->user();
+    $items = $this->service->list($user, $request->all());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Items retrieved successfully.',
-            'data' => OrderItemStepResource::collection($items),
-        ]);
-    }
+    return $this->success(OrderItemStepResource::collection($items), 'Items retrieved successfully.');
+  }
 
-    public function show(int $id): JsonResponse
-    {
-        $item = $this->service->find($id);
+  public function show(Request $request, int $id): JsonResponse
+  {
+    $user = $request->user();
+    $item = $this->service->find($user, $id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item retrieved successfully.',
-            'data' => $item ? new OrderItemStepResource($item) : null,
-        ]);
-    }
+    return $this->success($item ? new OrderItemStepResource($item) : null, 'Item retrieved successfully.');
+  }
 
-    public function store(StoreOrderItemStepRequest $request): JsonResponse
-    {
-        $item = $this->service->create($request->validated());
+  public function store(StoreOrderItemStepRequest $request): JsonResponse
+  {
+    $item = $this->service->create($request->user(), $request->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item created successfully.',
-            'data' => new OrderItemStepResource($item),
-        ], 201);
-    }
+    return $this->success(new OrderItemStepResource($item), 'Item created successfully.', 201);
+  }
 
-    public function update(int $id, UpdateOrderItemStepRequest $request): JsonResponse
-    {
-        $item = $this->service->update($id, $request->validated());
+  public function update(Request $request, int $id, UpdateOrderItemStepRequest $formRequest): JsonResponse
+  {
+    $item = $this->service->update($request->user(), $id, $formRequest->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item updated successfully.',
-            'data' => new OrderItemStepResource($item),
-        ]);
-    }
+    return $this->success(new OrderItemStepResource($item), 'Item updated successfully.');
+  }
 
-    public function destroy(int $id): JsonResponse
-    {
-        $this->service->delete($id);
+  public function destroy(Request $request, int $id): JsonResponse
+  {
+    $this->service->delete($request->user(), $id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item deleted successfully.',
-            'data' => null,
-        ]);
-    }
+    return $this->success(null, 'Item deleted successfully.');
+  }
 }

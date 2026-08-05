@@ -146,7 +146,7 @@ class RegisterUserService
 
     if ($lastUser && $lastUser->public_code) {
       preg_match('/(\d+)$/', $lastUser->public_code, $matches);
-      $nextNumber = isset($matches[1]) ? ((int) $matches[1] + 1) : 1;
+      $nextNumber = !empty($matches[1]) ? ((int) $matches[1] + 1) : 1;
     }
 
     // Zero-pad to at least 8 digits: 00000001, 00000002, ..., 00000100, 00000101

@@ -14,62 +14,44 @@ use Illuminate\Http\Request;
 
 class PackageStepController extends Controller
 {
-    public function __construct(private readonly PackageStepService $service)
-    {
-    }
+  public function __construct(private readonly PackageStepService $service)
+  {
+  }
 
-    public function index(Request $request): JsonResponse
-    {
-        $items = $this->service->list($request->all());
+  public function index(Request $request): JsonResponse
+  {
+    $user = $request->user();
+    $items = $this->service->list($user, $request->all());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Items retrieved successfully.',
-            'data' => PackageStepResource::collection($items),
-        ]);
-    }
+    return $this->success(PackageStepResource::collection($items), 'Items retrieved successfully.');
+  }
 
-    public function show(int $id): JsonResponse
-    {
-        $item = $this->service->find($id);
+  public function show(Request $request, int $id): JsonResponse
+  {
+    $user = $request->user();
+    $item = $this->service->find($user, $id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item retrieved successfully.',
-            'data' => $item ? new PackageStepResource($item) : null,
-        ]);
-    }
+    return $this->success($item ? new PackageStepResource($item) : null, 'Item retrieved successfully.');
+  }
 
-    public function store(StorePackageStepRequest $request): JsonResponse
-    {
-        $item = $this->service->create($request->validated());
+  public function store(StorePackageStepRequest $request): JsonResponse
+  {
+    $item = $this->service->create($request->user(), $request->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item created successfully.',
-            'data' => new PackageStepResource($item),
-        ], 201);
-    }
+    return $this->success(new PackageStepResource($item), 'Item created successfully.', 201);
+  }
 
-    public function update(int $id, UpdatePackageStepRequest $request): JsonResponse
-    {
-        $item = $this->service->update($id, $request->validated());
+  public function update(Request $request, int $id, UpdatePackageStepRequest $formRequest): JsonResponse
+  {
+    $item = $this->service->update($request->user(), $id, $formRequest->validated());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item updated successfully.',
-            'data' => new PackageStepResource($item),
-        ]);
-    }
+    return $this->success(new PackageStepResource($item), 'Item updated successfully.');
+  }
 
-    public function destroy(int $id): JsonResponse
-    {
-        $this->service->delete($id);
+  public function destroy(Request $request, int $id): JsonResponse
+  {
+    $this->service->delete($request->user(), $id);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item deleted successfully.',
-            'data' => null,
-        ]);
-    }
+    return $this->success(null, 'Item deleted successfully.');
+  }
 }

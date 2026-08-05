@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\PackageItemReception;
 
+use App\Http\Resources\PackageItem\PackageItemResource;
+use App\Http\Resources\User\UserResource;
+
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PackageItemReceptionResource extends JsonResource
@@ -23,8 +26,8 @@ class PackageItemReceptionResource extends JsonResource
       'count_reception' => $this->count_reception,
       'comment' => $this->comment,
       'created_at' => $this->created_at?->toISOString(),
-      'package_item' => $this->whenLoaded('packageItem', fn() => new \App\Http\Resources\PackageItem\PackageItemResource($this->packageItem)),
-      'inspector' => $this->whenLoaded('inspector', fn() => new \App\Http\Resources\User\UserResource($this->inspector)),
+      'package_item' => $this->whenLoaded('packageItem', fn() => new PackageItemResource($this->packageItem)),
+      'inspector' => $this->whenLoaded('inspector', fn() => new UserResource($this->inspector)),
     ];
   }
 }

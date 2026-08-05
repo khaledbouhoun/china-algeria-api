@@ -5,37 +5,38 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\OrderItemStep;
+use App\Models\User;
 
 class OrderItemStepService
 {
-    public function list(array $filters = []): mixed
-    {
-        return OrderItemStep::query()->get();
-    }
+  public function list(User $user, array $filters = []): mixed
+  {
+    return OrderItemStep::query()->get();
+  }
 
-    public function find(int $id): ?OrderItemStep
-    {
-        return OrderItemStep::find($id);
-    }
+  public function find(User $user, int $id): ?OrderItemStep
+  {
+    return OrderItemStep::find($id);
+  }
 
-    public function create(array $data): OrderItemStep
-    {
-        return OrderItemStep::create($data);
-    }
+  public function create(User $user, array $data): OrderItemStep
+  {
+    return OrderItemStep::create($data);
+  }
 
-    public function update(int $id, array $data): OrderItemStep
-    {
-        $model = OrderItemStep::findOrFail($id);
-        $model->fill($data);
-        $model->save();
+  public function update(User $user, int $id, array $data): OrderItemStep
+  {
+    $model = OrderItemStep::findOrFail($id);
+    $model->fill($data);
+    $model->save();
 
-        return $model->fresh();
-    }
+    return $model->fresh();
+  }
 
-    public function delete(int $id): bool
-    {
-        $model = OrderItemStep::findOrFail($id);
+  public function delete(User $user, int $id): bool
+  {
+    $model = OrderItemStep::findOrFail($id);
 
-        return (bool) $model->delete();
-    }
+    return (bool) $model->delete();
+  }
 }

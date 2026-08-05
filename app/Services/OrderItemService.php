@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\OrderItem;
+use App\Models\Status;
 use App\Models\User;
 use App\Queries\OrderItemVisibility;
+use Illuminate\Support\Facades\DB;
 
 class OrderItemService
 {
@@ -15,11 +17,14 @@ class OrderItemService
     $query = OrderItem::query();
     OrderItemVisibility::apply($query, $user);
 
-    if (isset($filters['order_id'])) {
-      $query->where('order_id', $filters['order_id']);
+    if (!empty($filters['order'])) {
+      $query->where('order_id', $filters['order']);
+    }
+    if (!empty($filters['designation'])) {
+      $query->where('designation', 'like', "%{$filters['designation']}%");
     }
 
-    return $query->with(['order', 'currentStep', 'steps', 'images'])->get();
+    return $query->with(['currentStep'])->get();
   }
 
   public function find(User $user, int $id): ?OrderItem
@@ -27,29 +32,51 @@ class OrderItemService
     $query = OrderItem::query()->whereKey($id);
     OrderItemVisibility::apply($query, $user);
 
-    return $query->with(['order', 'currentStep', 'steps', 'images'])->first();
+    return $query->with(['currentStep'])->firstOrFail();
   }
+
+
 
   public function create(User $user, array $data): OrderItem
   {
-    $model = OrderItem::create($data);
-    $model->load(['order', 'currentStep', 'steps', 'images']);
+    return DB::transaction(function () use ($user, $data): OrderItem {
+      $item = OrderItem::create($data);
 
-    return $model;
+      $step = $item->steps()->create([
+        'status_id' => Status::ITEM_CL_CREATED,
+        'zone_id' => $user->zone_id,
+        'user_id' => $user->id,
+        'created_by' => $user->id,
+      ]);
+
+      $item->update([
+        'current_step_id' => $step->id,
+      ]);
+
+      return $item->fresh()->load([
+        'currentStep',
+      ]);
+    });
   }
 
   public function update(User $user, int $id, array $data): OrderItem
   {
-    $model = OrderItem::findOrFail($id);
+    $query = OrderItem::query()->whereKey($id);
+    OrderItemVisibility::apply($query, $user);
+
+    $model = $query->firstOrFail();
     $model->fill($data);
     $model->save();
 
-    return $model->fresh()->load(['order', 'currentStep', 'steps', 'images']);
+    return $model->fresh()->load(['currentStep']);
   }
 
   public function delete(User $user, int $id): bool
   {
-    $model = OrderItem::findOrFail($id);
+    $query = OrderItem::query()->whereKey($id);
+    OrderItemVisibility::apply($query, $user);
+
+    $model = $query->firstOrFail();
 
     return (bool) $model->delete();
   }

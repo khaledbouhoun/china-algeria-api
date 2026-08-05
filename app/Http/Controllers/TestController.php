@@ -13,7 +13,9 @@ class TestController extends Controller
     $x = 123;
 
     return response()->json([
-      'x' => $x
+      'x' => $x,
+      'time' => now(),
+
     ]);
   }
 }

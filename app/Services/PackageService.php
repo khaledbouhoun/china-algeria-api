@@ -15,7 +15,7 @@ class PackageService
     $query = Package::query();
     PackageVisibility::apply($query, $user);
 
-    if (isset($filters['gladiator_id'])) {
+    if (!empty($filters['gladiator_id'])) {
       $query->where('gladiator_id', $filters['gladiator_id']);
     }
 

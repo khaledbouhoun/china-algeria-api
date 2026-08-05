@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\PackageStep;
 
+use App\Http\Resources\Package\PackageResource;
+use App\Http\Resources\Status\StatusResource;
+use App\Http\Resources\User\UserResource;
+use App\Http\Resources\Zone\ZoneResource;
+
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PackageStepResource extends JsonResource
@@ -19,11 +24,11 @@ class PackageStepResource extends JsonResource
       'comment' => $this->comment,
       'created_by' => $this->created_by,
       'created_at' => $this->created_at?->toISOString(),
-      'package' => $this->whenLoaded('package', fn() => new \App\Http\Resources\Package\PackageResource($this->package)),
-      'status' => $this->whenLoaded('status', fn() => new \App\Http\Resources\Status\StatusResource($this->status)),
-      'zone' => $this->whenLoaded('zone', fn() => new \App\Http\Resources\Zone\ZoneResource($this->zone)),
-      'user' => $this->whenLoaded('user', fn() => new \App\Http\Resources\User\UserResource($this->user)),
-      'creator' => $this->whenLoaded('creator', fn() => new \App\Http\Resources\User\UserResource($this->creator)),
+      'package' => $this->whenLoaded('package', fn() => new PackageResource($this->package)),
+      'status' => $this->whenLoaded('status', fn() => new StatusResource($this->status)),
+      'zone' => $this->whenLoaded('zone', fn() => new ZoneResource($this->zone)),
+      'user' => $this->whenLoaded('user', fn() => new UserResource($this->user)),
+      'creator' => $this->whenLoaded('creator', fn() => new UserResource($this->creator)),
     ];
   }
 }

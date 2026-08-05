@@ -15,7 +15,7 @@ class VisaService
     $query = Visa::query();
     VisaVisibility::apply($query, $user);
 
-    if (isset($filters['user_id'])) {
+    if (!empty($filters['user_id'])) {
       $query->where('user_id', $filters['user_id']);
     }
 

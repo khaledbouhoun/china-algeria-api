@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Visa;
 
+use App\Http\Resources\User\UserResource;
+
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class VisaResource extends JsonResource
@@ -20,8 +22,8 @@ class VisaResource extends JsonResource
       'created_by' => $this->created_by,
       'created_at' => $this->created_at?->toISOString(),
       'updated_at' => $this->updated_at?->toISOString(),
-      'user' => $this->whenLoaded('user', fn() => new \App\Http\Resources\User\UserResource($this->user)),
-      'creator' => $this->whenLoaded('creator', fn() => new \App\Http\Resources\User\UserResource($this->creator)),
+      'user' => $this->whenLoaded('user', fn() => new UserResource($this->user)),
+      'creator' => $this->whenLoaded('creator', fn() => new UserResource($this->creator)),
     ];
   }
 }

@@ -14,62 +14,44 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function __construct(private readonly UserService $service)
-    {
-    }
+  public function __construct(private readonly UserService $service)
+  {
+  }
 
-    public function index(Request $request): JsonResponse
-    {
-        $items = $this->service->list($request->all());
+  public function index(Request $request): JsonResponse
+  {
+    $user = $request->user();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Items retrieved successfully.',
-            'data' => UserResource::collection($items),
-        ]);
-    }
+    $items = $this->service->list($user, $request->all());
 
-    public function show(int $id): JsonResponse
-    {
-        $item = $this->service->find($id);
+    return $this->success(UserResource::collection($items), 'Items retrieved successfully.');
+  }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item retrieved successfully.',
-            'data' => $item ? new UserResource($item) : null,
-        ]);
-    }
+  public function show(Request $request, int $id): JsonResponse
+  {
+    $item = $this->service->find($request->user(), $id);
 
-    public function store(StoreUserRequest $request): JsonResponse
-    {
-        $item = $this->service->create($request->validated());
+    return $this->success($item ? new UserResource($item) : null, 'Item retrieved successfully.');
+  }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item created successfully.',
-            'data' => new UserResource($item),
-        ], 201);
-    }
+  public function store(StoreUserRequest $request): JsonResponse
+  {
+    $item = $this->service->create($request->user(), $request->validated());
 
-    public function update(int $id, UpdateUserRequest $request): JsonResponse
-    {
-        $item = $this->service->update($id, $request->validated());
+    return $this->success(new UserResource($item), 'Item created successfully.', 201);
+  }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item updated successfully.',
-            'data' => new UserResource($item),
-        ]);
-    }
+  public function update(Request $request, int $id, UpdateUserRequest $formRequest): JsonResponse
+  {
+    $item = $this->service->update($request->user(), $id, $formRequest->validated());
 
-    public function destroy(int $id): JsonResponse
-    {
-        $this->service->delete($id);
+    return $this->success(new UserResource($item), 'Item updated successfully.');
+  }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Item deleted successfully.',
-            'data' => null,
-        ]);
-    }
+  public function destroy(Request $request, int $id): JsonResponse
+  {
+    $this->service->delete($request->user(), $id);
+
+    return $this->success(null, 'Item deleted successfully.');
+  }
 }

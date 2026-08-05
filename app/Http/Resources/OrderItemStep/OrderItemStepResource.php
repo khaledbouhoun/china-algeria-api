@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\OrderItemStep;
 
+use App\Http\Resources\OrderItem\OrderItemResource;
+use App\Http\Resources\Status\StatusResource;
+use App\Http\Resources\User\UserResource;
+use App\Http\Resources\Zone\ZoneResource;
+
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderItemStepResource extends JsonResource
@@ -19,11 +24,11 @@ class OrderItemStepResource extends JsonResource
       'comment' => $this->comment,
       'created_by' => $this->created_by,
       'created_at' => $this->created_at?->toISOString(),
-      'item' => $this->whenLoaded('item', fn() => new \App\Http\Resources\OrderItem\OrderItemResource($this->item)),
-      'status' => $this->whenLoaded('status', fn() => new \App\Http\Resources\Status\StatusResource($this->status)),
-      'zone' => $this->whenLoaded('zone', fn() => new \App\Http\Resources\Zone\ZoneResource($this->zone)),
-      'user' => $this->whenLoaded('user', fn() => new \App\Http\Resources\User\UserResource($this->user)),
-      'creator' => $this->whenLoaded('creator', fn() => new \App\Http\Resources\User\UserResource($this->creator)),
+      'item' => $this->whenLoaded('item', fn() => new OrderItemResource($this->item)),
+      'status' => $this->whenLoaded('status', fn() => new StatusResource($this->status)),
+      'zone' => $this->whenLoaded('zone', fn() => new ZoneResource($this->zone)),
+      'user' => $this->whenLoaded('user', fn() => new UserResource($this->user)),
+      'creator' => $this->whenLoaded('creator', fn() => new UserResource($this->creator)),
     ];
   }
 }

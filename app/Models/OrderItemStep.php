@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class OrderItemStep extends Model
 {
   use HasFactory;
+  public const UPDATED_AT = null;
+
 
   protected $table = 'order_item_steps';
 
@@ -24,7 +26,6 @@ class OrderItemStep extends Model
   ];
 
   protected $casts = [
-    'id' => 'integer',
     'item_id' => 'integer',
     'status_id' => 'integer',
     'zone_id' => 'integer',

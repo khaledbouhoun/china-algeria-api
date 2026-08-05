@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\User;
 
+use App\Http\Resources\Role\RoleResource;
+use App\Http\Resources\Zone\ZoneResource;
+
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -25,8 +28,8 @@ class UserResource extends JsonResource
       'created_at' => $this->created_at?->toISOString(),
       'updated_at' => $this->updated_at?->toISOString(),
       'deleted_at' => $this->deleted_at?->toISOString(),
-      'role' => $this->whenLoaded('role', fn() => new \App\Http\Resources\Role\RoleResource($this->role)),
-      'zone' => $this->whenLoaded('zone', fn() => new \App\Http\Resources\Zone\ZoneResource($this->zone)),
+      'role' => $this->whenLoaded('role', fn() => new RoleResource($this->role)),
+      'zone' => $this->whenLoaded('zone', fn() => new ZoneResource($this->zone)),
     ];
   }
 }

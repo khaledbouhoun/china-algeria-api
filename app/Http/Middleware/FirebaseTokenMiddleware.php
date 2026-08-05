@@ -59,7 +59,7 @@ class FirebaseTokenMiddleware
 
     } catch (\Throwable $e) {
 
-      Log::error('Firebase authentication failed.', [
+      Log::error(' .', [
         'exception' => $e,
       ]);
 

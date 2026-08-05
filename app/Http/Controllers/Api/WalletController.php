@@ -20,61 +20,41 @@ class WalletController extends Controller
 
   public function index(Request $request): JsonResponse
   {
-    $user = $request->userOrFail();
+    $user = $request->user();
     $items = $this->service->list($user, $request->all());
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Items retrieved successfully.',
-      'data' => WalletResource::collection($items),
-    ]);
+    return $this->success(WalletResource::collection($items), 'Items retrieved successfully.');
   }
 
   public function show(Request $request, int $id): JsonResponse
   {
-    $user = $request->userOrFail();
+    $user = $request->user();
     $item = $this->service->find($user, $id);
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Item retrieved successfully.',
-      'data' => $item ? new WalletResource($item) : null,
-    ]);
+    return $this->success($item ? new WalletResource($item) : null, 'Item retrieved successfully.');
   }
 
   public function store(StoreWalletRequest $request): JsonResponse
   {
-    $user = $request->userOrFail();
+    $user = $request->user();
     $item = $this->service->create($user, $request->validated());
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Item created successfully.',
-      'data' => new WalletResource($item),
-    ], 201);
+    return $this->success(new WalletResource($item), 'Item created successfully.', 201);
   }
 
   public function update(Request $request, int $id, UpdateWalletRequest $formRequest): JsonResponse
   {
-    $user = $request->userOrFail();
+    $user = $request->user();
     $item = $this->service->update($user, $id, $formRequest->validated());
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Item updated successfully.',
-      'data' => new WalletResource($item),
-    ]);
+    return $this->success(new WalletResource($item), 'Item updated successfully.');
   }
 
   public function destroy(Request $request, int $id): JsonResponse
   {
-    $user = $request->userOrFail();
+    $user = $request->user();
     $this->service->delete($user, $id);
 
-    return response()->json([
-      'success' => true,
-      'message' => 'Item deleted successfully.',
-      'data' => null,
-    ]);
+    return $this->success(null, 'Item deleted successfully.');
   }
 }

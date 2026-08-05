@@ -22,14 +22,13 @@ class StoreOrderItemRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'public_code' => ['required', 'string', 'max:50', Rule::unique('order_items', 'public_code')],
+      'qr_code' => ['nullable', 'string', 'max:50', Rule::unique('order_items', 'qr_code')],
       'order_id' => ['required', 'integer', Rule::exists(Order::class, 'id')],
       'designation' => ['required', 'string', 'max:255'],
+      'price_unit_declared' => ['required', 'numeric'],
       'quantity_declared' => ['nullable', 'integer'],
-      'price_unit_declared' => ['nullable', 'numeric'],
       'weight_unit_declared' => ['nullable', 'numeric'],
-      'weight_total' => ['nullable', 'numeric'],
-      'current_step_id' => ['required', 'integer', Rule::exists(OrderItemStep::class, 'id')],
+      'weight_total' => ['required', 'numeric'],
       'comment' => ['nullable', 'string'],
     ];
   }
