@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Auth\UserResource;
+use App\Http\Resources\Role\RoleResource;
 use App\Http\Resources\WalletTransaction\WalletTransactionResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
