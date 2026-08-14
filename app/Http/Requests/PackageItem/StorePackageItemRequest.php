@@ -22,11 +22,11 @@ class StorePackageItemRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'package_id' => ['required', 'integer', Rule::exists(Package::class, 'id'),],
-      'order_item_id' => ['required', 'integer', Rule::exists(OrderItem::class, 'id'),],
-      'quantity_allocated' => ['required', 'integer', 'min:1',],
-      // 'weight_total_allocated' => ['required', 'numeric', 'min:0',],
-      // 'amount_total_allocated' => ['required', 'numeric', 'min:0',],
+      'package_id' => ['required', 'integer', Rule::exists(Package::class, 'id')],
+      'order_item_id' => ['required', 'integer', Rule::exists(OrderItem::class, 'id')],
+      'weight_total_allocated' => ['required', 'numeric', 'min:0'],
+      'quantity_allocated' => ['sometimes', 'integer', 'min:0'],
+      'amount_total_allocated' => ['sometimes', 'numeric', 'min:0'],
     ];
   }
 }

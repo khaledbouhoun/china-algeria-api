@@ -13,6 +13,9 @@ class Package extends Model
 {
   use HasFactory;
 
+  // Define the maximum allowed weight per package
+  public const MAX_WEIGHT_KG = 23.0;
+
   protected $table = 'packages';
 
   protected $fillable = [

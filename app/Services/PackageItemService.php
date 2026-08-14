@@ -45,67 +45,83 @@ class PackageItemService
   // }
 
   public function create(User $user, array $data): PackageItem
-{
+  {
     return DB::transaction(function () use ($user, $data): PackageItem {
+      $orderItem = OrderItem::query()
+        ->lockForUpdate()
+        ->findOrFail($data['order_item_id']);
 
-        // Lock the order item to prevent concurrent over-allocation.
-        $orderItem = OrderItem::query()
-            ->lockForUpdate()
-            ->findOrFail($data['order_item_id']);
+      $requestedWeight = (float) ($data['weight_total_allocated'] ?? 0);
+      $existingAllocatedWeight = (float) PackageItem::query()
+        ->where('order_item_id', $orderItem->id)
+        ->sum('weight_total_allocated');
 
+      $remainingWeight = (float) $orderItem->weight_total - $existingAllocatedWeight;
 
+      if ($requestedWeight > $remainingWeight) {
+        throw ValidationException::withMessages([
+          'weight_total_allocated' =>
+            "Only  {$remainingWeight} g   weight is remaining for this order item.",
+        ]);
+      }
 
-        // Calculate how much of the order item has already been allocated.
-        $totalSumItemsQuantity = PackageItem::query()
-            ->where('order_item_id', $orderItem->id)
-            ->sum('quantity_allocated');
+      // Calculate the quantity and amount based on the requested weight and unit values
 
-        $requestedQuantity = (int) $data['quantity_allocated'];
+      $requestedQuantity = (int) ($data['quantity_allocated'] ?? 0);
+      $unitWeight = $orderItem->weight_unit_declared !== null
+        ? (float) $orderItem->weight_unit_declared
+        : null;
+      $unitPrice = $orderItem->price_unit_declared ?? 0;
 
-        $remainingQuantity =
-            $orderItem->quantity_declared - $totalSumItemsQuantity;
+      // 1. Calculate Quantity
+      $quantityAllocated = $requestedQuantity;
+      if ($requestedQuantity <= 0 && $unitWeight !== null && $unitWeight > 0) {
+        $quantityAllocated = (int) round($requestedWeight / $unitWeight);
+      }
 
+      // 2. Calculate Weight Total
+      $weightTotal = $requestedWeight > 0
+        ? $requestedWeight
+        : (($unitWeight !== null && $unitWeight > 0) ? ($quantityAllocated * $unitWeight) : 0.0);
 
-        if ($requestedQuantity > $remainingQuantity) {
-            throw ValidationException::withMessages([
-                'quantity_allocated' =>
-                    "Only {$remainingQuantity} quantity is remaining for this order item.",
-            ]);
+      // 3. Calculate Amount Total (Fixed)
+      $amountTotal = 0.0;
+      if ($unitPrice > 0) {
+        if ($quantityAllocated > 0) {
+          $amountTotal = (float) $unitPrice * $quantityAllocated;
+        } elseif ($requestedWeight > 0 && $unitWeight !== null && $unitWeight > 0) {
+          // Only divide if unitWeight is strictly greater than 0
+          $amountTotal = (float) $unitPrice * ($requestedWeight / $unitWeight);
         }
+      }
 
-        // Calculate derived values on the server.
-        $weightTotal = $requestedQuantity
-            * $orderItem->weight_unit_declared;
+      // Create the PackageItem
 
-        $amountTotal = $requestedQuantity
-            * $orderItem->price_unit_declared;
+      $item = PackageItem::create([
+        'package_id' => $data['package_id'],
+        'order_item_id' => $orderItem->id,
+        'quantity_allocated' => $quantityAllocated,
+        'weight_total_allocated' => $weightTotal,
+        'amount_total_allocated' => $amountTotal,
+        'created_by' => $user->id,
+        'updated_by' => $user->id,
+      ]);
 
-        // Create the package item.
-        $item = PackageItem::create([
-            'package_id' => $data['package_id'],
-            'order_item_id' => $orderItem->id,
-            'quantity_allocated' => $requestedQuantity,
-            'weight_total_allocated' => $weightTotal,
-            'amount_total_allocated' => $amountTotal,
-        ]);
+      $step = $item->steps()->create([
+        'status_id' => Status::PACKAGE_ITEM_PACKAGED,
+        'zone_id' => $user->zone_id,
+        'user_id' => $user->id,
+      ]);
 
-        // Create the initial package-item step.
-        $step = $item->steps()->create([
-            'status_id' => Status::PACKAGE_ITEM_PACKAGED,
-            'zone_id' => $user->zone_id,
-            'user_id' => $user->id,
-        ]);
+      $item->update([
+        'current_step_id' => $step->id,
+      ]);
 
-        // Set the current step.
-        $item->update([
-            'current_step_id' => $step->id,
-        ]);
-
-        return $item->fresh()->load([
-            'currentStep',
-        ]);
+      return $item->fresh()->load([
+        'currentStep',
+      ]);
     });
-}
+  }
   public function update(User $user, int $id, array $data): PackageItem
   {
     $model = PackageItem::findOrFail($id);
