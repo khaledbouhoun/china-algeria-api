@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Requests\Package;
 
+use App\Models\Package;
 use App\Models\PackageStep;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StorePackageRequest extends FormRequest
+class StorePackageReceivedRequest extends FormRequest
 {
   public function authorize(): bool
   {
@@ -22,10 +23,8 @@ class StorePackageRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'qr_code' => ['required', 'string', 'max:255', Rule::unique('packages', 'qr_code')],
-      'weight' => ['nullable', 'numeric'],
-      'amount' => ['nullable', 'numeric'],
-      'comment' => ['nullable', 'string'],
+      'package_ids' => ['required', 'array', 'min:1'],
+      'package_ids.*' => ['required', 'integer', Rule::exists(Package::class, 'id')],
     ];
   }
 }

@@ -15,7 +15,11 @@ class PackageVisibility
       return $query;
     }
 
-    // TODO: Add role-specific visibility rules once the business access matrix is clarified.
+
+    if ($user->hasRole(User::ROLE_GLADIATOR)) {
+      return $query->where('gladiator_id', $user->id);
+    }
+
     return $query->whereRaw('1 = 0');
   }
 }

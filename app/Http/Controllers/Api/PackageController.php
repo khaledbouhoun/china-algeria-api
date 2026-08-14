@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Package\StorePackageReceivedRequest;
 use App\Http\Requests\Package\StorePackageRequest;
+use App\Http\Requests\Package\StorePackageWithItemsRequest;
 use App\Http\Requests\Package\UpdatePackageRequest;
 use App\Http\Resources\Package\PackageResource;
 use App\Services\PackageService;
@@ -56,5 +58,30 @@ class PackageController extends Controller
     $this->service->delete($user, $id);
 
     return $this->success(null, 'Item deleted successfully.');
+  }
+
+  // ==========================================
+  // Actions Functions
+  // ==========================================
+
+  public function createWithItems(StorePackageWithItemsRequest $request): JsonResponse
+  {
+    $item = $this->service->createWithItems($request->user(), $request->validated());
+
+    return $this->success(new PackageResource($item), 'Item with items created successfully.', 201);
+  }
+
+  public function receive(StorePackageReceivedRequest $request): JsonResponse
+  {
+    $user = $request->user();
+
+    $itemsIds = $request->validated('package_ids');
+
+    $items = $this->service->receive($user, $itemsIds);
+
+    return $this->success(
+      PackageResource::collection($items),
+      'Items received successfully.'
+    );
   }
 }

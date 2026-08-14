@@ -14,13 +14,15 @@ class PackageStep extends Model
 
   protected $table = 'package_steps';
 
+  public const UPDATED_AT = null;
+
+
   protected $fillable = [
     'package_id',
     'status_id',
     'zone_id',
     'user_id',
     'comment',
-    'created_by',
   ];
 
   protected $casts = [
@@ -29,7 +31,6 @@ class PackageStep extends Model
     'status_id' => 'integer',
     'zone_id' => 'integer',
     'user_id' => 'integer',
-    'created_by' => 'integer',
     'created_at' => 'datetime',
   ];
 
@@ -51,10 +52,5 @@ class PackageStep extends Model
   public function user(): BelongsTo
   {
     return $this->belongsTo(User::class, 'user_id');
-  }
-
-  public function creator(): BelongsTo
-  {
-    return $this->belongsTo(User::class, 'created_by');
   }
 }
