@@ -47,29 +47,50 @@ Route::middleware('firebase.token:false')->group(function () {
 });
 Route::middleware('firebase.token')->group(function () {
   Route::get('/me', [AuthController::class, 'me']);
-  });
-  Route::middleware([
-    'firebase.token',
-    'firebase.user',
-    ])->group(function () {
+});
+Route::middleware([
+  'firebase.token',
+  'firebase.user',
+])->group(function () {
 
+  // ── API routes ──────────────────────────────────────────────────────────────_
+  // All routes below require a valid Firebase token and a corresponding local user.
+
+  // ── Auth & Sessions ─────────────────────────────────────────────────────────
   Route::post('/login', [AuthController::class, 'login']);
-  Route::apiResource('roles', RoleController::class);
-  Route::apiResource('zones', ZoneController::class);
-  Route::apiResource('countries', CountryController::class);
-  Route::apiResource('statuses', StatusController::class);
-  Route::apiResource('users', UserController::class);
   Route::apiResource('user_sessions', UserSessionController::class);
+
+  // ── System & Reference Data (Lookups) ───────────────────────────────────────
+  Route::apiResource('roles', RoleController::class);
+  Route::apiResource('statuses', StatusController::class);
+  Route::apiResource('countries', CountryController::class);
+  Route::apiResource('zones', ZoneController::class);
+
+  // ── Users, Documents & Financials ───────────────────────────────────────────
+
+  Route::apiResource('users', UserController::class);
+  Route::apiResource('visas', VisaController::class);
   Route::apiResource('wallets', WalletController::class);
   Route::apiResource('wallet_transactions', WalletTransactionController::class);
-  Route::apiResource('visas', VisaController::class);
+
+  // ── Orders Domain ───────────────────────────────────────────────────────────
+  Route::post('orders/items', [OrderController::class, 'createWithItems']);
+
   Route::apiResource('orders', OrderController::class);
+
+  Route::post('order_items/receive', [OrderItemController::class, 'receive']);
   Route::apiResource('order_items', OrderItemController::class);
   Route::apiResource('order_item_steps', OrderItemStepController::class);
   Route::apiResource('order_item_images', OrderItemImageController::class);
+
+  // ── Packages & Logistics Domain ─────────────────────────────────────────────
+  Route::post('packages/items', [PackageController::class, 'createWithItems']);
+  Route::post('packages/receive', [PackageController::class, 'receive']);
   Route::apiResource('packages', PackageController::class);
   Route::apiResource('package_steps', PackageStepController::class);
+
   Route::apiResource('package_items', PackageItemController::class);
   Route::apiResource('package_item_steps', PackageItemStepController::class);
   Route::apiResource('package_item_receptions', PackageItemReceptionController::class);
+
 });

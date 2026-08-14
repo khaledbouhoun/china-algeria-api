@@ -36,7 +36,7 @@ class Handler extends ExceptionHandler
     // 404 - route/URI doesn't exist at all (bad endpoint, wrong id type, etc.)
     $this->renderable(function (NotFoundHttpException $e, Request $request) {
       if ($request->is('api/*')) {
-        return $this->apiError('not found.', 404);
+        return $this->apiError('Route not found.', 404);
       }
     });
 
