@@ -22,7 +22,6 @@ class PackageItemStepResource extends JsonResource
       'zone_id' => $this->zone_id,
       'user_id' => $this->user_id,
       'comment' => $this->comment,
-      'created_by' => $this->created_by,
       'created_at' => $this->created_at?->toISOString(),
       'package_item' => $this->whenLoaded('packageItem', fn() => new PackageItemResource($this->packageItem)),
       'status' => $this->whenLoaded('status', fn() => new StatusResource($this->status)),
