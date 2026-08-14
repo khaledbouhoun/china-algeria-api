@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Order\StoreOrderRequest;
+use App\Http\Requests\Order\StoreOrderWithItemsRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
 use App\Http\Resources\Order\OrderResource;
 use App\Services\OrderService;
@@ -51,5 +52,16 @@ class OrderController extends Controller
     $this->service->delete($request->user(), $id);
 
     return $this->success(null, 'Order deleted successfully.');
+  }
+
+  // ==========================================
+  // Actions Functions
+  // ==========================================
+
+  public function createWithItems(StoreOrderWithItemsRequest $request): JsonResponse
+  {
+    $order = $this->service->createWithItems($request->user(), $request->validated());
+
+    return $this->success(new OrderResource($order), 'Order with items created successfully.', 201);
   }
 }

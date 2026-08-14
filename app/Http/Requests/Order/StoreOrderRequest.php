@@ -24,15 +24,6 @@ class StoreOrderRequest extends FormRequest
     return [
       'client_id' => ['required', 'integer', Rule::exists(User::class, 'id')],
       'comment' => ['nullable', 'string'],
-      'items' => ['sometimes', 'array'],
-      'items.*.qr_code' => ['required', 'string', 'max:50', Rule::unique('order_items', 'qr_code')],
-      // 'items.*.order_id' => ['required', 'integer', Rule::exists(Order::class, 'id')],
-      'items.*.designation' => ['required', 'string', 'max:255'],
-      'items.*.price_unit_declared' => ['required', 'numeric'],
-      'items.*.quantity_declared' => ['nullable', 'integer'],
-      'items.*.weight_unit_declared' => ['nullable', 'numeric'],
-      'items.*.weight_total' => ['required', 'numeric'],
-      'items.*.comment' => ['nullable', 'string'],
     ];
   }
 }
