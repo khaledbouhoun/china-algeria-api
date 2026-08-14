@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Status;
 use App\Models\User;
 use App\Queries\OrderItemVisibility;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
 class OrderItemService
@@ -46,7 +47,6 @@ class OrderItemService
         'status_id' => Status::ITEM_CL_CREATED,
         'zone_id' => $user->zone_id,
         'user_id' => $user->id,
-        'created_by' => $user->id,
       ]);
 
       $item->update([
@@ -79,5 +79,35 @@ class OrderItemService
     $model = $query->firstOrFail();
 
     return (bool) $model->delete();
+  }
+
+  //==========================================
+  // Actions Functions
+  //==========================================
+
+  public function receive(User $user, array $itemsIds): Collection
+  {
+    return DB::transaction(function () use ($user, $itemsIds) {
+
+      $query = OrderItem::query()->whereIn('id', $itemsIds);
+
+      OrderItemVisibility::apply($query, $user);
+      $items = $query->get();
+
+      foreach ($items as $item) {
+
+        $step = $item->steps()->create([
+          'status_id' => Status::ITEM_A_RECEIVED,
+          'zone_id' => $user->zone_id,
+          'user_id' => $user->id,
+        ]);
+
+        $item->updateQuietly([
+          'current_step_id' => $step->id,
+        ]);
+      }
+
+      return $items->load(['currentStep']);
+    });
   }
 }

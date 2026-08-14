@@ -22,7 +22,6 @@ class OrderItemStep extends Model
     'zone_id',
     'user_id',
     'comment',
-    'created_by',
   ];
 
   protected $casts = [
@@ -30,7 +29,6 @@ class OrderItemStep extends Model
     'status_id' => 'integer',
     'zone_id' => 'integer',
     'user_id' => 'integer',
-    'created_by' => 'integer',
     'created_at' => 'datetime',
   ];
 
@@ -52,10 +50,5 @@ class OrderItemStep extends Model
   public function user(): BelongsTo
   {
     return $this->belongsTo(User::class, 'user_id');
-  }
-
-  public function creator(): BelongsTo
-  {
-    return $this->belongsTo(User::class, 'created_by');
   }
 }

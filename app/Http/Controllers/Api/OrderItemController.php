@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\OrderItem\StoreOrderItemReceivedRequest;
 use App\Http\Requests\OrderItem\StoreOrderItemRequest;
 use App\Http\Requests\OrderItem\UpdateOrderItemRequest;
 use App\Http\Resources\OrderItem\OrderItemResource;
@@ -56,5 +57,23 @@ class OrderItemController extends Controller
     $this->service->delete($user, $id);
 
     return $this->success(null, 'Item deleted successfully.');
+  }
+
+  // ==========================================
+  // Actions Functions
+  // ==========================================
+
+  public function receive(StoreOrderItemReceivedRequest $request): JsonResponse
+  {
+    $user = $request->user();
+
+    $itemsIds = $request->validated('items_ids');
+
+    $items = $this->service->receive($user, $itemsIds);
+
+    return $this->success(
+      OrderItemResource::collection($items),
+      'Items received successfully.'
+    );
   }
 }

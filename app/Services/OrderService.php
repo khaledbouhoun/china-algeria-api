@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
-
   public function __construct(
     private readonly OrderItemService $orderItemService,
   ) {
   }
+
   public function list(User $user, array $filters = []): mixed
   {
     $query = Order::query()->withCount('items');
@@ -23,6 +23,7 @@ class OrderService
 
     return $query->get();
   }
+
   public function find(User $user, int $id): Order
   {
     $query = Order::query()->whereKey($id);
@@ -31,28 +32,9 @@ class OrderService
     return $query->firstOrFail();
   }
 
-
-
   public function create(User $user, array $data): Order
   {
-    return DB::transaction(function () use ($user, $data) {
-      // $client_id = $user->client_id;
-      $items = $data['items'] ?? [];
-
-      unset($data['items']);
-      // add c
-      $order = Order::create($data);
-
-      foreach ($items as $item) {
-
-        $item['order_id'] = $order->id;
-
-        $this->orderItemService->create($user, $item);
-      }
-
-      return $order->fresh()->
-        load('items');
-    });
+    return Order::create($data);
   }
 
   public function update(User $user, int $id, array $data): Order
@@ -75,5 +57,26 @@ class OrderService
     $model = $query->firstOrFail();
 
     return (bool) $model->delete();
+  }
+
+  // ==========================================
+  // Actions Functions
+  // ==========================================
+
+  public function createWithItems(User $user, array $data): Order
+  {
+    return DB::transaction(function () use ($user, $data) {
+      $items = $data['items'] ?? [];
+      unset($data['items']);
+
+      $order = $this->create($user, $data);
+
+      foreach ($items as $item) {
+        $item['order_id'] = $order->id;
+        $this->orderItemService->create($user, $item);
+      }
+
+      return $order->fresh('items');
+    });
   }
 }
