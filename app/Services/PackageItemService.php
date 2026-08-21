@@ -60,47 +60,60 @@ class PackageItemService
 
       if ($requestedWeight > $remainingWeight) {
         throw ValidationException::withMessages([
-          'weight_total_allocated' =>
-            "Only  {$remainingWeight} g   weight is remaining for this order item.",
+          'weight_total_allocated' => 
+            "Only {$remainingWeight} g weight is remaining for this order item.",
         ]);
       }
 
-      // Calculate the quantity and amount based on the requested weight and unit values
-
-      $requestedQuantity = (int) ($data['quantity_allocated'] ?? 0);
-      $unitWeight = $orderItem->weight_unit_declared !== null
-        ? (float) $orderItem->weight_unit_declared
-        : null;
-      $unitPrice = $orderItem->price_unit_declared ?? 0;
-
-      // 1. Calculate Quantity
-      $quantityAllocated = $requestedQuantity;
-      if ($requestedQuantity <= 0 && $unitWeight !== null && $unitWeight > 0) {
-        $quantityAllocated = (int) round($requestedWeight / $unitWeight);
-      }
-
-      // 2. Calculate Weight Total
-      $weightTotal = $requestedWeight > 0
-        ? $requestedWeight
-        : (($unitWeight !== null && $unitWeight > 0) ? ($quantityAllocated * $unitWeight) : 0.0);
-
-      // 3. Calculate Amount Total (Fixed)
+      // --- NEW LOGIC: Branch based on item type (Bulk vs Discrete) ---
+      $isBulkItem = is_null($orderItem->quantity_declared);
+      
+      $quantityAllocated = null;
+      $weightTotal = $requestedWeight; 
       $amountTotal = 0.0;
-      if ($unitPrice > 0) {
-        if ($quantityAllocated > 0) {
-          $amountTotal = (float) $unitPrice * $quantityAllocated;
-        } elseif ($requestedWeight > 0 && $unitWeight !== null && $unitWeight > 0) {
-          // Only divide if unitWeight is strictly greater than 0
-          $amountTotal = (float) $unitPrice * ($requestedWeight / $unitWeight);
+      $unitPrice = (float) ($orderItem->price_unit_declared ?? 0);
+
+      if ($isBulkItem) {
+        // ---------------------------------------------------------
+        // MODE A: BULK ITEM (Weight only, no quantity)
+        // ---------------------------------------------------------
+        $quantityAllocated = null; // Explicitly null for uncounted items
+        
+        // If pricing is based on weight for bulk items (e.g., $5 per kg)
+        if ($unitPrice > 0 && $requestedWeight > 0) {
+            $amountTotal = $unitPrice * $requestedWeight; 
+        }
+
+      } else {
+        // ---------------------------------------------------------
+        // MODE B: DISCRETE ITEM (Countable books, phones, etc.)
+        // ---------------------------------------------------------
+        $requestedQuantity = (int) ($data['quantity_allocated'] ?? 0);
+        $unitWeight = (float) ($orderItem->weight_unit_declared ?? 0);
+        
+        $quantityAllocated = $requestedQuantity;
+
+        // Auto-calculate quantity if missing but unit weight exists
+        if ($quantityAllocated <= 0 && $unitWeight > 0) {
+          $quantityAllocated = (int) round($requestedWeight / $unitWeight);
+        }
+
+        // Calculate missing total weight based on pieces if weight wasn't sent
+        if ($weightTotal <= 0 && $unitWeight > 0) {
+          $weightTotal = $quantityAllocated * $unitWeight;
+        }
+
+        // Calculate amount based on discrete pieces
+        if ($unitPrice > 0 && $quantityAllocated > 0) {
+          $amountTotal = $unitPrice * $quantityAllocated;
         }
       }
 
       // Create the PackageItem
-
       $item = PackageItem::create([
         'package_id' => $data['package_id'],
         'order_item_id' => $orderItem->id,
-        'quantity_allocated' => $quantityAllocated,
+        'quantity_allocated' => $quantityAllocated, 
         'weight_total_allocated' => $weightTotal,
         'amount_total_allocated' => $amountTotal,
         'created_by' => $user->id,

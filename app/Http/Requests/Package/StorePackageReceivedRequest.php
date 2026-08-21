@@ -14,7 +14,13 @@ class StorePackageReceivedRequest extends FormRequest
 {
   public function authorize(): bool
   {
-    return true;
+    return $this->user()->hasRole(
+      User::ROLE_ADMIN,
+      User::ROLE_AGENT_A,
+      User::ROLE_GLADIATOR,
+      User::ROLE_DELIVERY,
+      User::ROLE_AGENT_C
+    );
   }
 
   /**

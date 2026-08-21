@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PackageItemReception\StoreWithItemsPackageItemReceptionRequest;
 use App\Http\Requests\PackageItemReception\StorePackageItemReceptionRequest;
 use App\Http\Requests\PackageItemReception\UpdatePackageItemReceptionRequest;
 use App\Http\Resources\PackageItemReception\PackageItemReceptionResource;
@@ -39,6 +40,17 @@ class PackageItemReceptionController extends Controller
     $item = $this->service->create($request->user(), $request->validated());
 
     return $this->success(new PackageItemReceptionResource($item), 'Item created successfully.', 201);
+  }
+
+  public function storeWithItems(StoreWithItemsPackageItemReceptionRequest $request): JsonResponse
+  {
+    $items = $this->service->createWithItems($request->user(), $request->validated());
+
+    return $this->success(
+      PackageItemReceptionResource::collection(collect($items)),
+      'All items inspected successfully.',
+      201
+    );
   }
 
   public function update(Request $request, int $id, UpdatePackageItemReceptionRequest $formRequest): JsonResponse

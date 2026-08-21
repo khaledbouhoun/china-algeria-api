@@ -23,9 +23,7 @@ class PackageService
     $query = Package::query();
     PackageVisibility::apply($query, $user);
 
-    if (!empty($filters['gladiator_id'])) {
-      $query->where('gladiator_id', $filters['gladiator_id']);
-    }
+
 
     return $query->with(['currentStep', 'steps', 'items'])->get();
   }
@@ -95,7 +93,7 @@ class PackageService
     return DB::transaction(function () use ($user, $data) {
       $items = $data['items'] ?? [];
       unset($data['items']);
-  
+
       $package = $this->create($user, $data);
 
       foreach ($items as $item) {
@@ -107,31 +105,81 @@ class PackageService
     });
   }
 
+  // public function receive(User $user, array $packageIds): Collection
+  // {
+  //   return DB::transaction(function () use ($user, $packageIds) {
+
+  //     $query = Package::query()->whereIn('id', $packageIds);
+  //     PackageVisibility::apply($query, $user);
+  //     $packages = $query->get();
+
+  //     foreach ($packages as $package) {
+  //       if ($package->currentStep?->status_id === Status::PACKAGE_B_RECEIVED) {
+  //         continue;
+  //       }
+
+  //       $step = $package->steps()->create([
+  //         'status_id' => Status::PACKAGE_B_RECEIVED,
+  //         'zone_id' => $user->zone_id,
+  //         'user_id' => $user->id,
+  //       ]);
+
+  //       $package->updateQuietly([
+  //         'current_step_id' => $step->id,
+  //       ]);
+  //     }
+
+  //     return $packages->load(['currentStep', 'steps', 'items']);
+  //   });
+  // }
+
   public function receive(User $user, array $packageIds): Collection
   {
-    return DB::transaction(function () use ($user, $packageIds) {
+    $newStatusId = $this->determineNewStatusFromRole($user);
 
-      $query = Package::query()->whereIn('id', $packageIds);
-      PackageVisibility::apply($query, $user);
-      $packages = $query->get();
+    if (!$newStatusId) {
+      abort(403, 'Your role is not authorized to receive packages.');
+    }
+
+    $isGladiator = $user->hasRole(User::ROLE_GLADIATOR);
+
+    return DB::transaction(function () use ($user, $packageIds, $newStatusId, $isGladiator) {
+      $packages = Package::whereIn('id', $packageIds)->get();
 
       foreach ($packages as $package) {
-        if ($package->currentStep?->status_id === Status::PACKAGE_B_RECEIVED) {
+        if ($package->currentStep?->status_id === $newStatusId) {
           continue;
         }
 
         $step = $package->steps()->create([
-          'status_id' => Status::PACKAGE_B_RECEIVED,
+          'status_id' => $newStatusId,
           'zone_id' => $user->zone_id,
           'user_id' => $user->id,
         ]);
 
-        $package->updateQuietly([
+        $updateData = [
           'current_step_id' => $step->id,
-        ]);
+        ];
+
+        if ($isGladiator) {
+          $updateData['gladiator_id'] = $user->id;
+        }
+
+        $package->updateQuietly($updateData);
       }
 
       return $packages->load(['currentStep', 'steps', 'items']);
     });
+  }
+
+  private function determineNewStatusFromRole(User $user): ?int
+  {
+    return match (true) {
+      $user->hasRole(User::ROLE_RESPONSABLE_A, User::ROLE_AGENT_A) => Status::PACKAGE_B_RECEIVED,   // B_RECEIVED
+      $user->hasRole(User::ROLE_GLADIATOR) => Status::PACKAGE_G_RECEIVED, // G_RECEIVED
+      $user->hasRole(User::ROLE_DELIVERY) => Status::PACKAGE_D_RECEIVED,  // D_RECEIVED
+      $user->hasRole(User::ROLE_RESPONSABLE_C, User::ROLE_AGENT_C) => Status::PACKAGE_C_RECEIVED,    // P_C_RECEIVED
+      default => null,
+    };
   }
 }

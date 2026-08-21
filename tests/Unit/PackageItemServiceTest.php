@@ -37,7 +37,7 @@ class PackageItemServiceTest extends TestCase
       $table->id();
       $table->unsignedBigInteger('package_id')->default(1);
       $table->unsignedBigInteger('order_item_id');
-      $table->integer('quantity_allocated')->default(0);
+      $table->integer('quantity_allocated')->nullable();
       $table->decimal('weight_total_allocated', 10, 3)->default(0);
       $table->decimal('amount_total_allocated', 14, 2)->default(0);
       $table->unsignedBigInteger('current_step_id')->nullable();
@@ -76,9 +76,9 @@ class PackageItemServiceTest extends TestCase
     PackageItem::create([
       'package_id' => 1,
       'order_item_id' => $orderItem->id,
-      'quantity_allocated' => 1,
+      'quantity_allocated' => null,
       'weight_total_allocated' => 10.000,
-      'amount_total_allocated' => 12.50,
+      'amount_total_allocated' => 125.00,
       'current_step_id' => 1,
       'quantity_recupered' => 0,
       'weight_total_recupered' => 0,
@@ -91,13 +91,40 @@ class PackageItemServiceTest extends TestCase
     $item = $service->create($user, [
       'package_id' => 1,
       'order_item_id' => $orderItem->id,
-      'quantity_allocated' => 2,
+      'quantity_allocated' => null,
       'weight_total_allocated' => 10.000,
-      'amount_total_allocated' => 25.00,
+      'amount_total_allocated' => 125.00,
     ]);
 
-    $this->assertSame(2, $item->quantity_allocated);
+    $this->assertNull($item->quantity_allocated);
     $this->assertSame('10.000', (string) $item->weight_total_allocated);
-    $this->assertSame('25.00', (string) $item->amount_total_allocated);
+    $this->assertSame('125.00', (string) $item->amount_total_allocated);
+  }
+
+  public function test_discrete_item_creation(): void
+  {
+    $orderItem = OrderItem::create([
+      'order_id' => 1,
+      'designation' => 'Discrete item',
+      'quantity_declared' => 10,
+      'price_unit_declared' => 15.00,
+      'weight_unit_declared' => 2.0,
+      'weight_total' => 20.000,
+      'current_step_id' => 1,
+    ]);
+
+    $user = new User(['id' => 99, 'zone_id' => 8]);
+    $service = new PackageItemService();
+
+    $item = $service->create($user, [
+      'package_id' => 1,
+      'order_item_id' => $orderItem->id,
+      'quantity_allocated' => 4,
+      'weight_total_allocated' => 8.000,
+    ]);
+
+    $this->assertSame(4, $item->quantity_allocated);
+    $this->assertSame('8.000', (string) $item->weight_total_allocated);
+    $this->assertSame('60.00', (string) $item->amount_total_allocated); // 4 * 15.00 = 60.00
   }
 }
