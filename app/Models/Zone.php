@@ -12,6 +12,12 @@ class Zone extends Model
 {
   use HasFactory;
 
+
+  public const EVERYWHERE = 1;
+  public const ZONE_A = 2;
+  public const ZONE_B = 3;
+  public const ZONE_C = 4;
+
   protected $table = 'zones';
 
   protected $fillable = [

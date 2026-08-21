@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\PackageStepController;
 use App\Http\Controllers\Api\PackageItemController;
 use App\Http\Controllers\Api\PackageItemStepController;
 use App\Http\Controllers\Api\PackageItemReceptionController;
+use App\Http\Controllers\Api\RecuperationController;
 use App\Http\Controllers\TestController;
 
 /*
@@ -91,6 +92,10 @@ Route::middleware([
 
   Route::apiResource('package_items', PackageItemController::class);
   Route::apiResource('package_item_steps', PackageItemStepController::class);
+  Route::post('package_item_receptions/items', [PackageItemReceptionController::class, 'storeWithItems']);
   Route::apiResource('package_item_receptions', PackageItemReceptionController::class);
+
+  // ── Client Recuperation Handover ───────────────────────────────────────────
+  Route::post('recuperations', [RecuperationController::class, 'store']);
 
 });
