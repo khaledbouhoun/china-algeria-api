@@ -14,6 +14,8 @@ class PackageItemReception extends Model
 
   protected $table = 'package_item_receptions';
 
+  public const UPDATED_AT = null;
+
   protected $fillable = [
     'package_item_id',
     'inspected_by',
