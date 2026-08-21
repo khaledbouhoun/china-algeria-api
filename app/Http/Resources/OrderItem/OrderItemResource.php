@@ -8,6 +8,7 @@ use App\Http\Resources\OrderItemImage\OrderItemImageResource;
 use App\Http\Resources\OrderItemStep\OrderItemStepResource;
 use App\Http\Resources\Order\OrderResource;
 
+use App\Http\Resources\PackageItem\PackageItemResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderItemResource extends JsonResource
@@ -16,7 +17,7 @@ class OrderItemResource extends JsonResource
   {
     return [
       'id' => $this->id,
-      'qr_code' => $this->qr_code,
+      'item_code' => $this->item_code,
       'order_id' => $this->order_id,
       'designation' => $this->designation,
       'quantity_declared' => $this->quantity_declared,
@@ -32,6 +33,7 @@ class OrderItemResource extends JsonResource
       'current_step' => $this->whenLoaded('currentStep', fn() => new OrderItemStepResource($this->currentStep)),
       'steps' => $this->whenLoaded('steps', fn() => OrderItemStepResource::collection($this->steps)),
       'images' => $this->whenLoaded('images', fn() => OrderItemImageResource::collection($this->images)),
+      'packageItems' => $this->whenLoaded('packageItems', fn() => PackageItemResource::collection($this->packageItems)),
     ];
   }
 }

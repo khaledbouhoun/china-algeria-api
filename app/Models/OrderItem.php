@@ -17,7 +17,7 @@ class OrderItem extends Model
   protected $table = 'order_items';
 
   protected $fillable = [
-    'qr_code',
+    'item_code',
     'order_id',
     'designation',
     'quantity_declared',

@@ -22,7 +22,7 @@ class StoreOrderItemRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'qr_code' => ['nullable', 'string', 'max:50', Rule::unique('order_items', 'qr_code')],
+      'item_code' => ['nullable', 'string', 'max:50', Rule::unique('order_items', 'item_code')],
       'order_id' => ['required', 'integer', Rule::exists(Order::class, 'id')],
       'designation' => ['required', 'string', 'max:255'],
       'price_unit_declared' => ['required', 'numeric'],

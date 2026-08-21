@@ -25,7 +25,7 @@ class StoreOrderWithItemsRequest extends FormRequest
       'client_id' => ['required', 'integer', Rule::exists(User::class, 'id')],
       'comment' => ['nullable', 'string'],
       'items' => ['required', 'array'],
-      'items.*.qr_code' => ['required', 'string', 'max:50', Rule::unique('order_items', 'qr_code')],
+      'items.*.item_code' => ['required', 'string', 'max:50', Rule::unique('order_items', 'item_code')],
       'items.*.designation' => ['required', 'string', 'max:255'],
       'items.*.price_unit_declared' => ['required', 'numeric'],
       'items.*.quantity_declared' => ['nullable', 'integer'],

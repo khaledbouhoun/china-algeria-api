@@ -25,7 +25,7 @@ class OrderItemService
       $query->where('designation', 'like', "%{$filters['designation']}%");
     }
 
-    return $query->with(['currentStep'])->get();
+    return $query->with(['currentStep', 'packageItems'])->get();
   }
 
   public function find(User $user, int $id): ?OrderItem

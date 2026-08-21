@@ -22,7 +22,7 @@ class UpdateOrderItemRequest extends FormRequest
   public function rules(): array
   {
     return [
-      'qr_code' => ['sometimes', 'string', 'max:50', Rule::unique('order_items', 'qr_code')->ignore($this->route('orderItem'))],
+      'item_code' => ['sometimes', 'string', 'max:50', Rule::unique('order_items', 'item_code')->ignore($this->route('orderItem'))],
       'order_id' => ['sometimes', 'integer', Rule::exists(Order::class, 'id')],
       'designation' => ['sometimes', 'string', 'max:255'],
       'quantity_declared' => ['nullable', 'integer'],
